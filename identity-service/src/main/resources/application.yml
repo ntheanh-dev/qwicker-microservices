@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: identity-service
+  datasource:
+    url: "jdbc:mysql://localhost:3306/identity"
+    username: "root"
+    password: "Admin@123"
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+  reactor:
+    debug-agent:
+      enabled: true
