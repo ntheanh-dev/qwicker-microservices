@@ -46,7 +46,7 @@ public class AuthenticationService {
     InvalidatedTokenRepository invalidatedTokenRepository;
 
     @NonFinal
-    @Value("${jwt.SIGNER_KEY}")
+    @Value("${jwt.signerKey}")
     protected String SIGNER_KEY;
 
     @NonFinal
