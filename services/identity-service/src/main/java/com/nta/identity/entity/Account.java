@@ -15,17 +15,17 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-public class User {
+public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
+    @Column(nullable = false, length = 30, unique = true)
     String username;
+    @Column(nullable = false)
     String password;
-    String firstName;
-    LocalDate dob;
-    String lastName;
-
+    @Column(length = 30, unique = true)
+    String email;
     @ManyToMany
     Set<Role> roles;
 }

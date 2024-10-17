@@ -11,11 +11,9 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserResponse {
+public class AccountResponse {
     String id;
     String username;
-    String firstName;
-    String lastName;
-    LocalDate dob;
+    String email;
     Set<RoleResponse> roles;
 }

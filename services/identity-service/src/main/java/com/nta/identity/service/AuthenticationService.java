@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.StringJoiner;
 import java.util.UUID;
 
+import com.nta.identity.entity.Account;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,11 +26,10 @@ import com.nta.identity.dto.request.RefreshRequest;
 import com.nta.identity.dto.response.AuthenticationResponse;
 import com.nta.identity.dto.response.IntrospectResponse;
 import com.nta.identity.entity.InvalidatedToken;
-import com.nta.identity.entity.User;
 import com.nta.identity.exception.AppException;
 import com.nta.identity.exception.ErrorCode;
 import com.nta.identity.repository.InvalidatedTokenRepository;
-import com.nta.identity.repository.UserRepository;
+import com.nta.identity.repository.AccountRepository;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthenticationService {
-    UserRepository userRepository;
+    AccountRepository accountRepository;
     InvalidatedTokenRepository invalidatedTokenRepository;
 
     @NonFinal
@@ -72,7 +72,7 @@ public class AuthenticationService {
 
     public AuthenticationResponse authenticate(final AuthenticationRequest request) {
         final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
-        final var user = userRepository
+        final var user = accountRepository
                 .findByUsername(request.getUsername())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
@@ -120,7 +120,7 @@ public class AuthenticationService {
         final var username = signedJWT.getJWTClaimsSet().getSubject();
 
         final var user =
-                userRepository.findByUsername(username).orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
+                accountRepository.findByUsername(username).orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
 
         final var token = generateToken(user);
 
@@ -130,19 +130,19 @@ public class AuthenticationService {
                 .build();
     }
 
-    private TokenInfo generateToken(final User user) {
+    private TokenInfo generateToken(final Account account) {
         final JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
         final Date expiryTime = new Date(Instant.ofEpochMilli(Instant.now().getEpochSecond() + VALID_DURATION)
                 .plus(VALID_DURATION, ChronoUnit.DAYS)
                 .toEpochMilli());
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(user.getUsername())
+                .subject(account.getUsername())
                 .issuer("nta.com")
                 .issueTime(new Date())
                 .expirationTime(expiryTime)
                 .jwtID(UUID.randomUUID().toString())
-                .claim("scope", buildScope(user))
-                .claim("userId", user.getId())
+                .claim("scope", buildScope(account))
+                .claim("userId", account.getId())
                 .build();
 
         final Payload payload = new Payload(jwtClaimsSet.toJSONObject());
@@ -182,11 +182,11 @@ public class AuthenticationService {
         return signedJWT;
     }
 
-    private String buildScope(final User user) {
+    private String buildScope(final Account account) {
         final StringJoiner stringJoiner = new StringJoiner(" ");
 
-        if (!CollectionUtils.isEmpty(user.getRoles()))
-            user.getRoles().forEach(role -> {
+        if (!CollectionUtils.isEmpty(account.getRoles()))
+            account.getRoles().forEach(role -> {
                 stringJoiner.add("ROLE_" + role.getName());
                 if (!CollectionUtils.isEmpty(role.getPermissions()))
                     role.getPermissions().forEach(permission -> stringJoiner.add(permission.getName()));
