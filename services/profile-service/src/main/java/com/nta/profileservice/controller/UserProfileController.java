@@ -1,5 +1,6 @@
 package com.nta.profileservice.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import com.nta.profileservice.dto.request.UserProfileCreationRequest;
@@ -14,18 +15,19 @@ import lombok.experimental.FieldDefaults;
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@RequestMapping("/users")
 public class UserProfileController {
     ProfileService profileService;
 
-    @PostMapping("/users")
-    ApiResponse<UserProfileResponse> createUserProfile(@RequestBody final UserProfileCreationRequest request) {
+    @PostMapping
+    ApiResponse<UserProfileResponse> createUserProfile(@RequestBody @Valid final UserProfileCreationRequest request) {
         final var response = profileService.createUserProfile(request);
         return ApiResponse.<UserProfileResponse>builder().result(response).build();
     }
 
-    @GetMapping("/users/{accountId}")
+    @GetMapping
     ApiResponse<UserProfileResponse> getProfileByAccountId(
-            @PathVariable("accountId") String accountId,
+            @RequestParam(value = "accountId") String accountId,
             @RequestParam(value = "profileType", defaultValue = "DEFAULT") String profileType) {
         final var response = profileService.getUserProfileByAccountIdAndProfileType(accountId, profileType);
 

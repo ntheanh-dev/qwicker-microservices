@@ -1,5 +1,7 @@
 package com.nta.profileservice.exception;
 
+import com.nta.profileservice.enums.ErrorCode;
+
 public class AppException extends RuntimeException {
 
     public AppException(ErrorCode errorCode) {

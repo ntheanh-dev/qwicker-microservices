@@ -3,6 +3,7 @@ package com.nta.profileservice.exception;
 import java.util.Map;
 import java.util.Objects;
 
+import com.nta.profileservice.enums.ErrorCode;
 import jakarta.validation.ConstraintViolation;
 
 import org.springframework.http.ResponseEntity;
@@ -77,10 +78,10 @@ public class GlobalExceptionHandler {
         apiResponse.setMessage(message);
         apiResponse.setCode(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode());
         if (exception.getMessage().contains(ProfileType.class.getSimpleName())) {
-                apiResponse.setCode(ErrorCode.INVALID_PROFILE_TYPE.getCode());
-                apiResponse.setMessage(ErrorCode.INVALID_PROFILE_TYPE.getMessage());
+            apiResponse.setCode(ErrorCode.INVALID_PROFILE_TYPE.getCode());
+            apiResponse.setMessage(ErrorCode.INVALID_PROFILE_TYPE.getMessage());
 
-                apiResponse.setDetails("Except values: " + utils.writeEnumValuesAsString(ProfileType.class));
+            apiResponse.setDetails("Except values: " + utils.writeEnumValuesAsString(ProfileType.class));
         }
         return ResponseEntity.badRequest().body(apiResponse);
     }

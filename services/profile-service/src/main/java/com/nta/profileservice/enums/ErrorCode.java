@@ -1,4 +1,4 @@
-package com.nta.profileservice.exception;
+package com.nta.profileservice.enums;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -11,6 +11,10 @@ public enum ErrorCode {
     INVALID_KEY(1001, "Uncategorized error", HttpStatus.BAD_REQUEST),
     INVALID_PROFILE_TYPE(1002, "Invalid profileType", HttpStatus.BAD_REQUEST),
     PROFILE_NOT_FOUND(1003, "Profile not found", HttpStatus.NOT_FOUND),
+    VEHICLE_NOT_FOUND(1004, "Vehicle not found", HttpStatus.NOT_FOUND),
+    AVATAR_BASE64_REQUIRED(1005, "Avatar base64 is required", HttpStatus.BAD_REQUEST),
+    IDENTITY_FRONT_BASE64_REQUIRED(1006, "Identity front base64 is required", HttpStatus.BAD_REQUEST),
+    IDENTITY_BACK_BASE64_REQUIRED(1007, "Identity back base64 is required", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
