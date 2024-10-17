@@ -1,5 +1,7 @@
 package com.nta.profileservice.dto.response;
 
+import com.nta.profileservice.enums.ProfileType;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -8,9 +10,11 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ProfileResponse {
+public class UserProfileResponse {
+    String id;
     String firstName;
     String lastName;
     String email;
     String avatar;
+    ProfileType profileType;
 }
