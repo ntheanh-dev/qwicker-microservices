@@ -1,10 +1,10 @@
 package com.nta.identity.dto.request;
 
-import java.time.LocalDate;
-
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-import com.nta.identity.validator.DobConstraint;
+import com.nta.identity.enums.AccountType;
+import com.nta.identity.enums.ProfileType;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -24,6 +24,19 @@ public class AccountCreationRequest {
     String firstName;
     String lastName;
 
-    @DobConstraint(min = 10, message = "INVALID_DOB")
-    LocalDate dob;
+    @NotNull(message = "AVATAR_BASE64_REQUIRED")
+    String avatarBase64;
+
+    @NotNull(message = "PROFILE_TYPE_REQUIRED")
+    ProfileType profileType;
+
+    @NotNull(message = "ACCOUNT_TYPE_REQUIRED")
+    AccountType accountType;
+
+    // for shipper
+    // profile-service will be responsible for validating
+    String vehicleNumber;
+    String vehicleId;
+    String identityFBase64;
+    String identityBBase64;
 }

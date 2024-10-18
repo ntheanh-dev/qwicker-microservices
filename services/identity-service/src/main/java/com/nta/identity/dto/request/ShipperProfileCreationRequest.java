@@ -1,4 +1,4 @@
-package com.nta.profileservice.dto.request;
+package com.nta.identity.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 
@@ -13,9 +13,7 @@ public class ShipperProfileCreationRequest {
     String accountId;
     String firstName;
     String lastName;
-    @NotNull(message = "VEHICLE_NUMBER_REQUIRED")
     String vehicleNumber;
-    @NotNull(message = "VEHICLE_ID_REQUIRED")
     String vehicleId;
 
     @NotNull(message = "AVATAR_BASE64_REQUIRED")

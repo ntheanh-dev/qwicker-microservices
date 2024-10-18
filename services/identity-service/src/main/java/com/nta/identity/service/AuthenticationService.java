@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.StringJoiner;
 import java.util.UUID;
 
-import com.nta.identity.entity.Account;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,11 +24,12 @@ import com.nta.identity.dto.request.LogoutRequest;
 import com.nta.identity.dto.request.RefreshRequest;
 import com.nta.identity.dto.response.AuthenticationResponse;
 import com.nta.identity.dto.response.IntrospectResponse;
+import com.nta.identity.entity.Account;
 import com.nta.identity.entity.InvalidatedToken;
+import com.nta.identity.enums.ErrorCode;
 import com.nta.identity.exception.AppException;
-import com.nta.identity.exception.ErrorCode;
-import com.nta.identity.repository.InvalidatedTokenRepository;
 import com.nta.identity.repository.AccountRepository;
+import com.nta.identity.repository.InvalidatedTokenRepository;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -119,8 +119,9 @@ public class AuthenticationService {
 
         final var username = signedJWT.getJWTClaimsSet().getSubject();
 
-        final var user =
-                accountRepository.findByUsername(username).orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
+        final var user = accountRepository
+                .findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
 
         final var token = generateToken(user);
 

@@ -1,4 +1,4 @@
-package com.nta.identity.exception;
+package com.nta.identity.enums;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -16,6 +16,13 @@ public enum ErrorCode {
     UNAUTHENTICATED(1006, "Unauthenticated", HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(1007, "You do not have permission", HttpStatus.FORBIDDEN),
     INVALID_DOB(1008, "Your age must be at least {min}", HttpStatus.BAD_REQUEST),
+    AVATAR_BASE64_REQUIRED(1009, "avatarBase64 field is required", HttpStatus.BAD_REQUEST),
+    INVALID_PROFILE_TYPE(10010, "Invalid profileType", HttpStatus.BAD_REQUEST),
+    INVALID_ACCOUNT_TYPE(10011, "Invalid accountType", HttpStatus.BAD_REQUEST),
+    IDENTITY_FRONT_BASE64_REQUIRED(10012, "identityFBase64 field is required", HttpStatus.BAD_REQUEST),
+    IDENTITY_BACK_BASE64_REQUIRED(10013, "identityBBase64 field is required", HttpStatus.BAD_REQUEST),
+    PROFILE_TYPE_REQUIRED(10014, "profileType field is required", HttpStatus.BAD_REQUEST),
+    ACCOUNT_TYPE_REQUIRED(10015, "accountType field is required", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

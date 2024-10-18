@@ -1,6 +1,5 @@
 package com.nta.identity.dto.response;
 
-import java.time.LocalDate;
 import java.util.Set;
 
 import lombok.*;

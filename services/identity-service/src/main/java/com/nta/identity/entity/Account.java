@@ -1,6 +1,5 @@
 package com.nta.identity.entity;
 
-import java.time.LocalDate;
 import java.util.Set;
 
 import jakarta.persistence.*;
@@ -22,10 +21,13 @@ public class Account {
 
     @Column(nullable = false, length = 30, unique = true)
     String username;
+
     @Column(nullable = false)
     String password;
+
     @Column(length = 30, unique = true)
     String email;
+
     @ManyToMany
     Set<Role> roles;
 }

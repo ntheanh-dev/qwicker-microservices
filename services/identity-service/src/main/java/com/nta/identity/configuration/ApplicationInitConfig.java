@@ -2,7 +2,6 @@ package com.nta.identity.configuration;
 
 import java.util.HashSet;
 
-import com.nta.identity.entity.Account;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -10,9 +9,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.nta.identity.constant.PredefinedRole;
+import com.nta.identity.entity.Account;
 import com.nta.identity.entity.Role;
-import com.nta.identity.repository.RoleRepository;
 import com.nta.identity.repository.AccountRepository;
+import com.nta.identity.repository.RoleRepository;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +46,11 @@ public class ApplicationInitConfig {
                 roleRepository.save(Role.builder()
                         .name(PredefinedRole.USER_ROLE)
                         .description("User role")
+                        .build());
+
+                roleRepository.save(Role.builder()
+                        .name(PredefinedRole.SHIPPER_ROLE)
+                        .description("Shipper role")
                         .build());
 
                 Role adminRole = roleRepository.save(Role.builder()

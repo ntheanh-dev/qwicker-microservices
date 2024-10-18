@@ -6,9 +6,9 @@ import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.*;
 
-import com.nta.identity.dto.request.ApiResponse;
 import com.nta.identity.dto.request.AccountCreationRequest;
 import com.nta.identity.dto.request.AccountUpdateRequest;
+import com.nta.identity.dto.request.ApiResponse;
 import com.nta.identity.dto.response.AccountResponse;
 import com.nta.identity.service.AccountService;
 
@@ -46,12 +46,12 @@ public class AccountController {
                 .build();
     }
 
-    @GetMapping("/my-info")
-    ApiResponse<AccountResponse> getMyInfo() {
-        return ApiResponse.<AccountResponse>builder()
-                .result(accountService.getMyInfo())
-                .build();
-    }
+    //    @GetMapping("/my-info")
+    //    ApiResponse<AccountResponse> getMyInfo() {
+    //        return ApiResponse.<AccountResponse>builder()
+    //                .result(accountService.getMyInfo())
+    //                .build();
+    //    }
 
     @DeleteMapping("/{accountId}")
     ApiResponse<String> deleteAccount(@PathVariable String accountId) {
@@ -60,7 +60,8 @@ public class AccountController {
     }
 
     @PutMapping("/{accountId}")
-    ApiResponse<AccountResponse> updateAccount(@PathVariable String accountId, @RequestBody AccountUpdateRequest request) {
+    ApiResponse<AccountResponse> updateAccount(
+            @PathVariable String accountId, @RequestBody AccountUpdateRequest request) {
         return ApiResponse.<AccountResponse>builder()
                 .result(accountService.updateAccount(accountId, request))
                 .build();

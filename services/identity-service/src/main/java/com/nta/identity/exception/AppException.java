@@ -1,5 +1,7 @@
 package com.nta.identity.exception;
 
+import com.nta.identity.enums.ErrorCode;
+
 public class AppException extends RuntimeException {
 
     public AppException(ErrorCode errorCode) {

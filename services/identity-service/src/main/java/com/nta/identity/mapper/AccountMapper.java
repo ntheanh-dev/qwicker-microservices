@@ -1,6 +1,5 @@
 package com.nta.identity.mapper;
 
-import com.nta.identity.entity.Account;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -8,6 +7,7 @@ import org.mapstruct.MappingTarget;
 import com.nta.identity.dto.request.AccountCreationRequest;
 import com.nta.identity.dto.request.AccountUpdateRequest;
 import com.nta.identity.dto.response.AccountResponse;
+import com.nta.identity.entity.Account;
 
 @Mapper(componentModel = "spring")
 public interface AccountMapper {
