@@ -5,9 +5,9 @@ import org.springframework.stereotype.Service;
 import com.nta.profileservice.dto.request.UserProfileCreationRequest;
 import com.nta.profileservice.dto.response.UserProfileResponse;
 import com.nta.profileservice.entity.Profile;
+import com.nta.profileservice.enums.ErrorCode;
 import com.nta.profileservice.enums.ProfileType;
 import com.nta.profileservice.exception.AppException;
-import com.nta.profileservice.enums.ErrorCode;
 import com.nta.profileservice.mapper.ProfileMapper;
 import com.nta.profileservice.repository.ProfileRepository;
 
@@ -36,5 +36,11 @@ public class ProfileService {
                 .findByAccountIdAndProfileType(accountId, ProfileType.valueOf(profileType))
                 .orElseThrow(() -> new AppException(ErrorCode.PROFILE_NOT_FOUND));
         return profileMapper.toUserProfileResponse(profile);
+    }
+
+    public Profile findByAccountId(final String accountId) {
+        return profileRepository
+                .findByAccountId(accountId)
+                .orElseThrow(() -> new AppException(ErrorCode.PROFILE_NOT_FOUND));
     }
 }

@@ -3,7 +3,6 @@ package com.nta.profileservice.exception;
 import java.util.Map;
 import java.util.Objects;
 
-import com.nta.profileservice.enums.ErrorCode;
 import jakarta.validation.ConstraintViolation;
 
 import org.springframework.http.ResponseEntity;
@@ -16,6 +15,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.nta.profileservice.components.Utils;
 import com.nta.profileservice.dto.response.ApiResponse;
+import com.nta.profileservice.enums.ErrorCode;
 import com.nta.profileservice.enums.ProfileType;
 
 import lombok.RequiredArgsConstructor;

@@ -11,4 +11,6 @@ import com.nta.profileservice.enums.ProfileType;
 @Repository
 public interface ProfileRepository extends JpaRepository<Profile, String> {
     Optional<Profile> findByAccountIdAndProfileType(String accountId, ProfileType profileType);
+
+    Optional<Profile> findByAccountId(String accountId);
 }

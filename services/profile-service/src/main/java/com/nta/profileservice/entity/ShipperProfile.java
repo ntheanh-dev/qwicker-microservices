@@ -18,9 +18,6 @@ public class ShipperProfile {
     @Column(name = "shipper_profile_id")
     String id;
 
-    @Column(nullable = false, length = 150) // one account may have multiple profiles like fb,google ...
-    String accountId;
-
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     Profile profile;
 

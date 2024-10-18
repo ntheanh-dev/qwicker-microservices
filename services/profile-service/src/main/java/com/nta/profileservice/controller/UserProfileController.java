@@ -1,6 +1,7 @@
 package com.nta.profileservice.controller;
 
 import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.*;
 
 import com.nta.profileservice.dto.request.UserProfileCreationRequest;
