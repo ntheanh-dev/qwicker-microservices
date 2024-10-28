@@ -17,6 +17,8 @@ public enum ErrorCode {
     IDENTITY_BACK_BASE64_REQUIRED(1007, "identityBBase64 field is required", HttpStatus.BAD_REQUEST),
     VEHICLE_NUMBER_REQUIRED(1008, "vehicleNumber field is required", HttpStatus.BAD_REQUEST),
     VEHICLE_ID_REQUIRED(1009, "vehicleId field is required", HttpStatus.BAD_REQUEST),
+    UNAUTHENTICATED(1006,"Unauthenticated", HttpStatus.UNAUTHORIZED),
+    UNAUTHORIZED(1007, "You do not have permission", HttpStatus.FORBIDDEN),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
