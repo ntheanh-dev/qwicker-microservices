@@ -4,6 +4,7 @@ import java.util.List;
 
 import jakarta.validation.Valid;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.nta.identity.dto.request.AccountCreationRequest;
@@ -25,15 +26,16 @@ import lombok.extern.slf4j.Slf4j;
 public class AccountController {
     AccountService accountService;
 
-    @PostMapping
+    @PostMapping("/registration")
     ApiResponse<AccountResponse> createUser(@RequestBody @Valid AccountCreationRequest request) {
         return ApiResponse.<AccountResponse>builder()
                 .result(accountService.createAccount(request))
                 .build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    ApiResponse<List<AccountResponse>> getUsers() {
+    ApiResponse<List<AccountResponse>> getAccounts() {
         return ApiResponse.<List<AccountResponse>>builder()
                 .result(accountService.getAccounts())
                 .build();

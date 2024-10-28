@@ -133,9 +133,8 @@ public class AuthenticationService {
 
     private TokenInfo generateToken(final Account account) {
         final JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
-        final Date expiryTime = new Date(Instant.ofEpochMilli(Instant.now().getEpochSecond() + VALID_DURATION)
-                .plus(VALID_DURATION, ChronoUnit.DAYS)
-                .toEpochMilli());
+        final Date expiryTime = new Date(Instant.now().plus(VALID_DURATION, ChronoUnit.DAYS).toEpochMilli());
+
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
                 .subject(account.getUsername())
                 .issuer("nta.com")
@@ -161,7 +160,6 @@ public class AuthenticationService {
 
     private SignedJWT verifyToken(final String token, final boolean isRefresh) throws JOSEException, ParseException {
         final JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
-
         final SignedJWT signedJWT = SignedJWT.parse(token);
 
         final Date expiryTime = isRefresh
