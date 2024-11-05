@@ -71,6 +71,8 @@ public class ShipperProfileService {
     }
 
     public List<ShipperProfileResponse> getAllShipperProfiles() {
-        return shipperProfileRepository.findAll().stream().map(shipperProfileMapper::toShipperProfileResponse).toList();
+        return shipperProfileRepository.findAll().stream()
+                .map(shipperProfileMapper::toShipperProfileResponse)
+                .toList();
     }
 }

@@ -13,7 +13,7 @@ public class WebClientConfiguration {
     @Bean
     public WebClient webClient() {
         return WebClient.builder()
-                .baseUrl("http://localhost:8080/identity")
+                .baseUrl("http://localhost:8082/identity")
                 .build();
     }
 

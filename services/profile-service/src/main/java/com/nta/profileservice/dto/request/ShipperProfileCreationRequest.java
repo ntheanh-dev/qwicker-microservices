@@ -13,8 +13,10 @@ public class ShipperProfileCreationRequest {
     String accountId;
     String firstName;
     String lastName;
+
     @NotNull(message = "VEHICLE_NUMBER_REQUIRED")
     String vehicleNumber;
+
     @NotNull(message = "VEHICLE_ID_REQUIRED")
     String vehicleId;
 

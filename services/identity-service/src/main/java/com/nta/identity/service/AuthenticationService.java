@@ -133,7 +133,8 @@ public class AuthenticationService {
 
     private TokenInfo generateToken(final Account account) {
         final JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
-        final Date expiryTime = new Date(Instant.now().plus(VALID_DURATION, ChronoUnit.DAYS).toEpochMilli());
+        final Date expiryTime =
+                new Date(Instant.now().plus(VALID_DURATION, ChronoUnit.DAYS).toEpochMilli());
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
                 .subject(account.getUsername())

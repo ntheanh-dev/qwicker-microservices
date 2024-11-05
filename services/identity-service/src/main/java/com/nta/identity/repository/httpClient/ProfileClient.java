@@ -10,9 +10,9 @@ import com.nta.identity.dto.request.UserProfileCreationRequest;
 
 @FeignClient(name = "profile-service", url = "http://localhost:8081/profile")
 public interface ProfileClient {
-    @PostMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/internal/users", produces = MediaType.APPLICATION_JSON_VALUE)
     Object createUserProfile(@RequestBody UserProfileCreationRequest userProfileCreationRequest);
 
-    @PostMapping(value = "/shippers", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/internal/shippers", produces = MediaType.APPLICATION_JSON_VALUE)
     Object createShipperProfile(@RequestBody ShipperProfileCreationRequest shipperProfileCreationRequest);
 }

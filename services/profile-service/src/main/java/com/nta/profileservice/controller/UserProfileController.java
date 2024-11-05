@@ -1,10 +1,7 @@
 package com.nta.profileservice.controller;
 
-import jakarta.validation.Valid;
-
 import org.springframework.web.bind.annotation.*;
 
-import com.nta.profileservice.dto.request.UserProfileCreationRequest;
 import com.nta.profileservice.dto.response.ApiResponse;
 import com.nta.profileservice.dto.response.UserProfileResponse;
 import com.nta.profileservice.service.ProfileService;
@@ -19,12 +16,6 @@ import lombok.experimental.FieldDefaults;
 @RequestMapping("/users")
 public class UserProfileController {
     ProfileService profileService;
-
-    @PostMapping
-    ApiResponse<UserProfileResponse> createUserProfile(@RequestBody @Valid final UserProfileCreationRequest request) {
-        final var response = profileService.createUserProfile(request);
-        return ApiResponse.<UserProfileResponse>builder().result(response).build();
-    }
 
     @GetMapping
     ApiResponse<UserProfileResponse> getProfileByAccountId(
