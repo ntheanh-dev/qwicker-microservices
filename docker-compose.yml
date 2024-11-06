@@ -1,0 +1,8 @@
+services:
+  mongo:
+    image: 'bitnami/mongodb:7.0.11'
+    ports:
+      - 27018:27017
+    environment:
+      MONGODB_ROOT_USER: root
+      MONGODB_ROOT_PASSWORD: Admin@123

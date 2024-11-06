@@ -22,4 +22,8 @@ spring:
             - Path=${app.api-prefix}/profile/**
           filters:
             - StripPrefix=2
+        - id: notification-service
+          predicates:
+            - Path=${app.api-prefix}/notification/**
+            - StripPrefix=2
 
