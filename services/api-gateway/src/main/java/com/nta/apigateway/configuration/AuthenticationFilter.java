@@ -39,7 +39,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     private String apiPrefix;
 
     @NonFinal
-    private String[] PUBLIC_ENDPOINTS = new String[]{"/identity/auth/.*", "/identity/accounts/registration"};
+    private String[] PUBLIC_ENDPOINTS = new String[]{"/identity/auth/.*", "/identity/accounts/registration","/notification/email/send"};
 
     @Override
     public Mono<Void> filter(final ServerWebExchange exchange, final GatewayFilterChain chain) {
