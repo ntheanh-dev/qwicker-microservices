@@ -1,15 +1,14 @@
-package com.nta.notification.dto.request;
+package com.nta.identity.dto.request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class SendEmailRequest {
-    Recipient to;
-    String subject;
-    String htmlContent;
+public class OTPverifyRequest {
+    String otp;
+    String email;
 }

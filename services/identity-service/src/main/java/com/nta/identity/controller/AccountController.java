@@ -7,10 +7,9 @@ import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import com.nta.identity.dto.request.AccountCreationRequest;
-import com.nta.identity.dto.request.AccountUpdateRequest;
-import com.nta.identity.dto.request.ApiResponse;
+import com.nta.identity.dto.request.*;
 import com.nta.identity.dto.response.AccountResponse;
+import com.nta.identity.dto.response.DataExistResponse;
 import com.nta.identity.service.AccountService;
 
 import lombok.AccessLevel;
@@ -31,6 +30,18 @@ public class AccountController {
         return ApiResponse.<AccountResponse>builder()
                 .result(accountService.createAccount(request))
                 .build();
+    }
+
+    @PostMapping("/registration/sent-otp")
+    ApiResponse<?> creatAndSentOtp(@RequestBody @Valid SentOtpRequest request) {
+        accountService.creatAndSentOtp(request);
+        return ApiResponse.builder().build();
+    }
+
+    @PostMapping("/registration/verify-otp")
+    ApiResponse<?> verifyOtp(@RequestBody @Valid OTPverifyRequest request) {
+        accountService.verifyOTP(request);
+        return ApiResponse.builder().build();
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -66,6 +77,20 @@ public class AccountController {
             @PathVariable String accountId, @RequestBody AccountUpdateRequest request) {
         return ApiResponse.<AccountResponse>builder()
                 .result(accountService.updateAccount(accountId, request))
+                .build();
+    }
+
+    @PostMapping("/check-username-exists")
+    ApiResponse<DataExistResponse> checkIfUsernameExists(@RequestBody @Valid CheckUsernameExistsRequest request) {
+        return ApiResponse.<DataExistResponse>builder()
+                .result(accountService.checkIfUsernameExist(request))
+                .build();
+    }
+
+    @PostMapping("/check-email-exists")
+    ApiResponse<DataExistResponse> checkIfEmailExists(@RequestBody @Valid CheckEmailExistsRequest request) {
+        return ApiResponse.<DataExistResponse>builder()
+                .result(accountService.checkIfEmailExist(request))
                 .build();
     }
 }

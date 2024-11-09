@@ -1,18 +1,22 @@
 package com.nta.notification.service;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
 import com.nta.notification.dto.request.EmailRequest;
 import com.nta.notification.dto.request.SendEmailRequest;
 import com.nta.notification.dto.request.Sender;
 import com.nta.notification.dto.response.EmailResponse;
-import com.nta.notification.httpclient.EmailClient;
+import com.nta.notification.repository.httpclient.EmailClient;
+
 import feign.FeignException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -21,7 +25,9 @@ import java.util.List;
 public class EmailService {
     EmailClient emailClient;
 
-    String APIKEY = "";
+    @Value("${notification.email.brevo-apikey}")
+    @NonFinal
+    String APIKEY;
 
     public EmailResponse sendEmail(final SendEmailRequest sendEmailRequest) {
         final EmailRequest emailRequest = EmailRequest.builder()

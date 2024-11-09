@@ -2,17 +2,20 @@ package com.nta.identity.service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import jakarta.transaction.Transactional;
 
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.nta.event.dto.NotificationEvent;
 import com.nta.identity.constant.PredefinedRole;
-import com.nta.identity.dto.request.AccountCreationRequest;
-import com.nta.identity.dto.request.AccountUpdateRequest;
+import com.nta.identity.dto.request.*;
 import com.nta.identity.dto.response.AccountResponse;
+import com.nta.identity.dto.response.DataExistResponse;
 import com.nta.identity.entity.Account;
 import com.nta.identity.entity.Role;
 import com.nta.identity.enums.AccountType;
@@ -40,6 +43,8 @@ public class AccountService {
     PasswordEncoder passwordEncoder;
     ProfileClient profileClient;
     ProfileMapper profileMapper;
+    RedisService redisService;
+    KafkaTemplate<String, Object> kafkaTemplate;
 
     @Transactional
     public AccountResponse createAccount(final AccountCreationRequest request) {
@@ -54,7 +59,7 @@ public class AccountService {
             account.setRoles(roles);
             account = accountRepository.save(account);
 
-            //  Call profile-service to create a Profile
+            log.info("Call profile-service to create a Profile");
             final var shipperProfileRequest = profileMapper.toShipperProfileCreationRequest(request);
             shipperProfileRequest.setAccountId(account.getId());
             final var shipperProfileResponse = profileClient.createShipperProfile(shipperProfileRequest);
@@ -66,7 +71,7 @@ public class AccountService {
             account.setRoles(roles);
             account = accountRepository.save(account);
 
-            //  Call profile-service to create a Profile
+            log.info("Call profile-service to create a Profile");
             final var userProfileRequest = profileMapper.toUserProfileCreationRequest(request);
             userProfileRequest.setAccountId(account.getId());
             final var userProfileResponse = profileClient.createUserProfile(userProfileRequest);
@@ -117,5 +122,47 @@ public class AccountService {
     public AccountResponse getAccount(final String id) {
         return accountMapper.toAccountResponse(
                 accountRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED)));
+    }
+
+    public DataExistResponse checkIfUsernameExist(final CheckUsernameExistsRequest request) {
+        return DataExistResponse.builder()
+                .isExist(accountRepository.existsByUsername(request.getUsername()))
+                .build();
+    }
+
+    public DataExistResponse checkIfEmailExist(final CheckEmailExistsRequest request) {
+        return DataExistResponse.builder()
+                .isExist(accountRepository.existsByEmail(request.getEmail()))
+                .build();
+    }
+
+    public void creatAndSentOtp(final SentOtpRequest request) {
+        if (!redisService.isRedisLive()) {
+            throw new AppException(ErrorCode.REDIS_SERVER_UNAVAILABLE);
+        }
+        final String otp = String.valueOf((int) (Math.random() * 9000) + 1000);
+        redisService.set(request.getToEmail(), otp);
+        redisService.setTimeToLive(request.getToEmail(), 1);
+        // Call to notification-service to sent otp to user
+        final NotificationEvent notificationEvent = NotificationEvent.builder()
+                .channel("EMAIL")
+                .recipient(request.getToEmail())
+                .templateCode("01")
+                .param(Map.of("otp", otp, "otp-TTL", "3"))
+                .build();
+        kafkaTemplate.send("notification-delivery", notificationEvent);
+    }
+
+    public void verifyOTP(final OTPverifyRequest request) {
+        if (!redisService.isRedisLive()) {
+            throw new AppException(ErrorCode.REDIS_SERVER_UNAVAILABLE);
+        }
+        if (redisService.getKey(request.getEmail()) != null) {
+            if (!redisService.hashExists(request.getEmail(), request.getOtp())) {
+                throw new AppException(ErrorCode.OTP_INVALID);
+            }
+        } else {
+            throw new AppException(ErrorCode.OTP_NOT_FOUND);
+        }
     }
 }

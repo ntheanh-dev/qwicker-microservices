@@ -1,14 +1,8 @@
 package com.nta.apigateway.configuration;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nta.apigateway.dto.response.ApiResponse;
-import com.nta.apigateway.service.IdentityService;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -21,10 +15,18 @@ import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Mono;
 
-import java.util.Arrays;
-import java.util.List;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nta.apigateway.dto.response.ApiResponse;
+import com.nta.apigateway.service.IdentityService;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
 
 @Component
 @RequiredArgsConstructor
@@ -39,7 +41,13 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     private String apiPrefix;
 
     @NonFinal
-    private String[] PUBLIC_ENDPOINTS = new String[]{"/identity/auth/.*", "/identity/accounts/registration","/notification/email/send"};
+    private String[] PUBLIC_ENDPOINTS = new String[] {
+        "/identity/auth/.*",
+        "/identity/accounts/registration/.*",
+        "/identity/accounts/check-username-exists",
+        "/identity/accounts/check-email-exists",
+        "/notification/email/send"
+    };
 
     @Override
     public Mono<Void> filter(final ServerWebExchange exchange, final GatewayFilterChain chain) {
@@ -53,15 +61,17 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
         }
 
         final String token = authHeader.getFirst().replace("Bearer ", "");
-        return identityService.introspect(token).flatMap(introspectResponseApiResponse -> {
-            if (introspectResponseApiResponse.getResult().isValid()) {
-                return chain.filter(exchange);
-            }
-            else {
-                log.info("invalid token");
-                return unauthenticated(exchange.getResponse());
-            }
-        }).onErrorResume(throwable -> unauthenticated(exchange.getResponse())); // loi 500, 502...
+        return identityService
+                .introspect(token)
+                .flatMap(introspectResponseApiResponse -> {
+                    if (introspectResponseApiResponse.getResult().isValid()) {
+                        return chain.filter(exchange);
+                    } else {
+                        log.info("invalid token");
+                        return unauthenticated(exchange.getResponse());
+                    }
+                })
+                .onErrorResume(throwable -> unauthenticated(exchange.getResponse())); // loi 500, 502...
     }
 
     @Override
@@ -71,7 +81,8 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
     Mono<Void> unauthenticated(final ServerHttpResponse response) {
 
-        ApiResponse<?> apiResponse = ApiResponse.builder().message("Unauthenticated").code(1014).build();
+        ApiResponse<?> apiResponse =
+                ApiResponse.builder().message("Unauthenticated").code(1014).build();
         String body = null;
         try {
             body = objectMapper.writeValueAsString(apiResponse);
@@ -85,6 +96,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     }
 
     private boolean isPublicEndpoint(final ServerHttpRequest request) {
-        return Arrays.stream(PUBLIC_ENDPOINTS).anyMatch(s -> request.getURI().getPath().matches(apiPrefix + s));
+        return Arrays.stream(PUBLIC_ENDPOINTS)
+                .anyMatch(s -> request.getURI().getPath().matches(apiPrefix + s));
     }
 }

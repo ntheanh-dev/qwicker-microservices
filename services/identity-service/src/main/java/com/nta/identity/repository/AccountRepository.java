@@ -11,5 +11,7 @@ import com.nta.identity.entity.Account;
 public interface AccountRepository extends JpaRepository<Account, String> {
     boolean existsByUsername(final String username);
 
+    boolean existsByEmail(final String email);
+
     Optional<Account> findByUsername(final String username);
 }

@@ -23,6 +23,11 @@ public enum ErrorCode {
     IDENTITY_BACK_BASE64_REQUIRED(10013, "identityBBase64 field is required", HttpStatus.BAD_REQUEST),
     PROFILE_TYPE_REQUIRED(10014, "profileType field is required", HttpStatus.BAD_REQUEST),
     ACCOUNT_TYPE_REQUIRED(10015, "accountType field is required", HttpStatus.BAD_REQUEST),
+    NOT_NULL(10016, "field is required", HttpStatus.BAD_REQUEST),
+    NOT_BLANK(10017, "field is required", HttpStatus.BAD_REQUEST),
+    REDIS_SERVER_UNAVAILABLE(10018, "Redis server unavailable", HttpStatus.SERVICE_UNAVAILABLE),
+    OTP_INVALID(10019, "OTP is invalid", HttpStatus.BAD_REQUEST),
+    OTP_NOT_FOUND(10020, "OTP not found", HttpStatus.NOT_FOUND),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

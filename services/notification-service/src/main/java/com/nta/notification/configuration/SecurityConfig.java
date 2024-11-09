@@ -1,7 +1,5 @@
 package com.nta.notification.configuration;
 
-import com.nta.notification.configuration.CustomJwtDecoder;
-import com.nta.notification.configuration.JwtAuthenticationEntryPoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;

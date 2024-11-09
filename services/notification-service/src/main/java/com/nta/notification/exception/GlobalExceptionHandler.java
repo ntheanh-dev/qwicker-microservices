@@ -1,22 +1,21 @@
 package com.nta.notification.exception;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import com.nta.notification.dto.response.ApiResponse;
-import com.nta.notification.enums.ErrorCode;
-import com.nta.notification.exception.AppException;
+import java.util.Map;
+import java.util.Objects;
+
 import jakarta.validation.ConstraintViolation;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.util.Map;
-import java.util.Objects;
+import com.nta.notification.dto.response.ApiResponse;
+import com.nta.notification.enums.ErrorCode;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @ControllerAdvice
 @Slf4j
