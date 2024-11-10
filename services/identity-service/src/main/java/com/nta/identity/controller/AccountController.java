@@ -2,7 +2,6 @@ package com.nta.identity.controller;
 
 import java.util.List;
 
-import com.nta.identity.dto.response.ApiResponse;
 import jakarta.validation.Valid;
 
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -10,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.nta.identity.dto.request.*;
 import com.nta.identity.dto.response.AccountResponse;
+import com.nta.identity.dto.response.ApiResponse;
 import com.nta.identity.dto.response.DataExistResponse;
 import com.nta.identity.service.AccountService;
 

@@ -2,7 +2,7 @@ package com.nta.fileservice.exception;
 
 import com.nta.fileservice.enums.ErrorCode;
 
-public class AppException extends RuntimeException{
+public class AppException extends RuntimeException {
 
     public AppException(ErrorCode errorCode) {
         super(errorCode.getMessage());

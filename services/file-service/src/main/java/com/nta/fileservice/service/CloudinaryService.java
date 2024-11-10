@@ -1,23 +1,24 @@
 package com.nta.fileservice.service;
 
-import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
-import com.nta.fileservice.enums.ErrorCode;
-import com.nta.fileservice.exception.AppException;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
+import com.nta.fileservice.enums.ErrorCode;
+import com.nta.fileservice.exception.AppException;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
@@ -47,7 +48,11 @@ public class CloudinaryService {
     public String uploadImage(final String base64) {
         byte[] bytes = Base64.getDecoder().decode(base64.getBytes());
         try {
-            return this.cloudinary.uploader().upload(bytes, ObjectUtils.asMap("resource_type", "auto")).get("secure_url").toString();
+            return this.cloudinary
+                    .uploader()
+                    .upload(bytes, ObjectUtils.asMap("resource_type", "auto"))
+                    .get("secure_url")
+                    .toString();
         } catch (Exception e) {
             log.error("Cannot upload file: ", e);
             throw new AppException(ErrorCode.UPLOAD_FILE_FAILED);
@@ -64,7 +69,7 @@ public class CloudinaryService {
         CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
 
         try {
-            allOf.get();  // Chờ tất cả các tác vụ hoàn thành
+            allOf.get(); // Chờ tất cả các tác vụ hoàn thành
         } catch (InterruptedException | ExecutionException e) {
             log.error("Cannot upload file: ", e);
             throw new AppException(ErrorCode.UPLOAD_FILE_FAILED);
@@ -73,7 +78,7 @@ public class CloudinaryService {
         // Trả về kết quả theo thứ tự ban đầu
         List<String> resultUrls = new ArrayList<>();
         for (CompletableFuture<String> future : futures) {
-            resultUrls.add(future.join());  // Lấy kết quả của từng task
+            resultUrls.add(future.join()); // Lấy kết quả của từng task
         }
 
         return resultUrls;

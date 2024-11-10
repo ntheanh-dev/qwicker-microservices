@@ -1,5 +1,7 @@
 package com.nta.notification.controller;
 
+import java.io.IOException;
+
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Controller;
 
@@ -9,8 +11,6 @@ import com.nta.notification.service.EmailService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
-import java.io.IOException;
 
 @Controller
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)

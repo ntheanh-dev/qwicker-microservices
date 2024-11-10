@@ -148,7 +148,7 @@ public class AccountService {
                 .channel("EMAIL")
                 .recipient(request.getToEmail())
                 .templateCode("otpMailTemplate.ftl")
-                .param(Map.of("username",request.getUsername(),"otp", otp, "otpTTL", 3))
+                .param(Map.of("username", request.getUsername(), "otp", otp, "otpTTL", 3))
                 .build();
         kafkaTemplate.send("notification-sent-otp", notificationEvent);
     }

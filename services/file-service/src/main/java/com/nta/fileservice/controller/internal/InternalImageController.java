@@ -1,17 +1,20 @@
 package com.nta.fileservice.controller.internal;
 
-import com.nta.fileservice.dto.request.UploadImageRequest;
-import com.nta.fileservice.dto.response.ApiResponse;
-import com.nta.fileservice.dto.response.UploadImageResponse;
-import com.nta.fileservice.service.FileService;
 import jakarta.validation.Valid;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.nta.fileservice.dto.request.UploadImageRequest;
+import com.nta.fileservice.dto.response.ApiResponse;
+import com.nta.fileservice.dto.response.UploadImageResponse;
+import com.nta.fileservice.service.FileService;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,5 +30,4 @@ public class InternalImageController {
                 .result(fileService.uploadImage(request))
                 .build();
     }
-
 }
