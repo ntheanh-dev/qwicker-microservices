@@ -1,5 +1,8 @@
 package com.nta.profileservice.service;
 
+import com.nta.profileservice.dto.request.UploadImageRequest;
+import com.nta.profileservice.dto.response.UploadImageResponse;
+import com.nta.profileservice.repository.httpClient.FileClient;
 import org.springframework.stereotype.Service;
 
 import com.nta.profileservice.dto.request.UserProfileCreationRequest;
@@ -18,14 +21,19 @@ import lombok.experimental.FieldDefaults;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class ProfileService {
+public class UserProfileService {
     ProfileRepository profileRepository;
     ProfileMapper profileMapper;
+    FileClient fileClient;
 
     public UserProfileResponse createUserProfile(final UserProfileCreationRequest request) {
         Profile userProfile = profileMapper.toUserProfile(request);
-        // TODO: Call a upload service to upload avatar
-
+        // Call file-service to upload avatar
+        final UploadImageResponse uploadImageResponse = fileClient.uploadImage(UploadImageRequest.builder()
+                        .isMultiple(false)
+                        .base64(request.getAvatarBase64())
+                .build());
+        userProfile.setAvatar(uploadImageResponse.getUrl());
         userProfile = profileRepository.save(userProfile);
         return profileMapper.toUserProfileResponse(userProfile);
     }

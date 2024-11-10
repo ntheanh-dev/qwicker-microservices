@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.nta.profileservice.dto.request.UserProfileCreationRequest;
 import com.nta.profileservice.dto.response.ApiResponse;
 import com.nta.profileservice.dto.response.UserProfileResponse;
-import com.nta.profileservice.service.ProfileService;
+import com.nta.profileservice.service.UserProfileService;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +21,11 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequestMapping("/internal/users")
 public class InternalUserProfileController {
-    ProfileService profileService;
+    UserProfileService userProfileService;
 
     @PostMapping
     ApiResponse<UserProfileResponse> createUserProfile(@RequestBody @Valid final UserProfileCreationRequest request) {
-        final var response = profileService.createUserProfile(request);
+        final var response = userProfileService.createUserProfile(request);
         return ApiResponse.<UserProfileResponse>builder().result(response).build();
     }
 }

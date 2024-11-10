@@ -16,7 +16,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import com.nta.identity.dto.request.ApiResponse;
+import com.nta.identity.dto.response.ApiResponse;
 import com.nta.identity.enums.AccountType;
 import com.nta.identity.enums.ErrorCode;
 import com.nta.identity.enums.ProfileType;

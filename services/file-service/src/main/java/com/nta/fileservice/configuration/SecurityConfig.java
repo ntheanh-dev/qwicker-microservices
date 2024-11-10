@@ -1,4 +1,4 @@
-package com.nta.identity.configuration;
+package com.nta.fileservice.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,13 +19,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private static final String[] PUBLIC_ENDPOINTS = {
-        "/accounts/registration.*",
-        "/accounts/check-username-exists",
-        "/accounts/check-email-exists",
-        "/auth/token",
-        "/auth/introspect",
-        "/auth/logout",
-        "/auth/refresh"
+        "/internal/images/upload",
     };
 
     private final CustomJwtDecoder customJwtDecoder;

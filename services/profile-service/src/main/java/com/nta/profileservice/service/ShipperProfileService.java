@@ -31,7 +31,7 @@ public class ShipperProfileService {
     VehicleService vehicleService;
     ProfileMapper profileMapper;
     ProfileRepository profileRepository;
-    ProfileService profileService;
+    UserProfileService userProfileService;
     private final ShipperProfileMapper shipperProfileMapper;
 
     @Transactional
@@ -59,7 +59,7 @@ public class ShipperProfileService {
     }
 
     public ShipperProfileResponse getShipperProfile(final String accountId) {
-        final Profile profile = profileService.findByAccountId(accountId);
+        final Profile profile = userProfileService.findByAccountId(accountId);
         final ShipperProfile shipperProfile = shipperProfileRepository
                 .findByProfileId(profile.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.PROFILE_NOT_FOUND));

@@ -1,17 +1,15 @@
-package com.nta.identity.configuration;
+package com.nta.fileservice.configuration;
 
-import java.io.IOException;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nta.fileservice.dto.response.ApiResponse;
+import com.nta.fileservice.enums.ErrorCode;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nta.identity.dto.response.ApiResponse;
-import com.nta.identity.enums.ErrorCode;
+import java.io.IOException;
 
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override

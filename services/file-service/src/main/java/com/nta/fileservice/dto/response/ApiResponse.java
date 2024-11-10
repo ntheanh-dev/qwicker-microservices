@@ -1,4 +1,4 @@
-package com.nta.identity.dto.request;
+package com.nta.fileservice.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
