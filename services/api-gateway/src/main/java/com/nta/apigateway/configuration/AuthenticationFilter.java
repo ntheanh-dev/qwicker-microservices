@@ -46,7 +46,6 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
         "/identity/accounts/registration/.*",
         "/identity/accounts/check-username-exists",
         "/identity/accounts/check-email-exists",
-        "/notification/email/send"
     };
 
     @Override

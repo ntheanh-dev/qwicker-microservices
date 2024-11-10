@@ -15,4 +15,5 @@ public class SentOtpRequest {
     @NotNull(message = "NOT_NULL")
     @NotBlank(message = "NOT_BLANK")
     String toEmail;
+    String username;
 }

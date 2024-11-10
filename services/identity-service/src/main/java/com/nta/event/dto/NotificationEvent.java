@@ -14,5 +14,5 @@ public class NotificationEvent {
     String channel;
     String recipient;
     String templateCode;
-    Map<String, String> param;
+    Map<String, Object> param;
 }

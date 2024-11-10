@@ -15,5 +15,5 @@ import com.nta.notification.dto.response.EmailResponse;
 public interface EmailClient {
 
     @PostMapping(value = "/v3/smtp/email", produces = MediaType.APPLICATION_JSON_VALUE)
-    EmailResponse sentEmail(@RequestHeader("api-key") String apiKey, @RequestBody EmailRequest body);
+    EmailResponse sendEmail(@RequestHeader("api-key") String apiKey, @RequestBody EmailRequest body);
 }

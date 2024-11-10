@@ -4,13 +4,13 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Controller;
 
 import com.nta.event.dto.NotificationEvent;
-import com.nta.notification.dto.request.Recipient;
-import com.nta.notification.dto.request.SendEmailRequest;
 import com.nta.notification.service.EmailService;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+
+import java.io.IOException;
 
 @Controller
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -18,15 +18,8 @@ import lombok.experimental.FieldDefaults;
 public class NotificationController {
     EmailService emailService;
 
-    @KafkaListener(topics = "notification-delivery")
-    public void listenNotificationDelivery(final NotificationEvent message) {
-        final Recipient recipient =
-                Recipient.builder().email(message.getRecipient()).build();
-        final SendEmailRequest sendEmailRequest = SendEmailRequest.builder()
-                .to(recipient)
-                .subject("OTP TEST")
-                .htmlContent("Opt cua ban la: " + message.getParam().get("otp"))
-                .build();
-        emailService.sendEmail(sendEmailRequest);
+    @KafkaListener(topics = "notification-sent-otp")
+    public void listenNotificationSentOTP(final NotificationEvent message) throws IOException {
+        emailService.sendOTP(message);
     }
 }

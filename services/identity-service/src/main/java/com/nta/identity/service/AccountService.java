@@ -142,23 +142,24 @@ public class AccountService {
         }
         final String otp = String.valueOf((int) (Math.random() * 9000) + 1000);
         redisService.set(request.getToEmail(), otp);
-        redisService.setTimeToLive(request.getToEmail(), 1);
-        // Call to notification-service to sent otp to user
+        redisService.setTimeToLive(request.getToEmail(), 10);
+        // Call notification-service to sent otp to user
         final NotificationEvent notificationEvent = NotificationEvent.builder()
                 .channel("EMAIL")
                 .recipient(request.getToEmail())
-                .templateCode("01")
-                .param(Map.of("otp", otp, "otp-TTL", "3"))
+                .templateCode("otpMailTemplate.ftl")
+                .param(Map.of("username",request.getUsername(),"otp", otp, "otpTTL", 3))
                 .build();
-        kafkaTemplate.send("notification-delivery", notificationEvent);
+        kafkaTemplate.send("notification-sent-otp", notificationEvent);
     }
 
     public void verifyOTP(final OTPverifyRequest request) {
         if (!redisService.isRedisLive()) {
             throw new AppException(ErrorCode.REDIS_SERVER_UNAVAILABLE);
         }
+        log.info("request: {}", request);
         if (redisService.getKey(request.getEmail()) != null) {
-            if (!redisService.hashExists(request.getEmail(), request.getOtp())) {
+            if (!redisService.hasValue(request.getEmail(), request.getOtp())) {
                 throw new AppException(ErrorCode.OTP_INVALID);
             }
         } else {
