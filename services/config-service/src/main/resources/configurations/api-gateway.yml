@@ -1,12 +1,8 @@
 server:
   port: 8888
-
 app:
   api-prefix: /api/v3
-
 spring:
-  application:
-    name : api-gateway
   cloud:
     gateway:
       routes:

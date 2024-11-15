@@ -1,6 +1,6 @@
 spring:
   config:
     import: optional:configserver:http://localhost:8889
-  application:
-    name: profile-service
 
+  application:
+    name: discovery-service

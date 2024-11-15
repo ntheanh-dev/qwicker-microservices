@@ -142,7 +142,7 @@ public class AccountService {
         }
         final String otp = String.valueOf((int) (Math.random() * 9000) + 1000);
         redisService.set(request.getToEmail(), otp);
-        redisService.setTimeToLive(request.getToEmail(), 10);
+        redisService.setTimeToLive(request.getToEmail(), 3);
         // Call notification-service to sent otp to user
         final NotificationEvent notificationEvent = NotificationEvent.builder()
                 .channel("EMAIL")

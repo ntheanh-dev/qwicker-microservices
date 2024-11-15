@@ -3,10 +3,6 @@ server:
   servlet:
     context-path: /file
 
-spring:
-  application:
-    name: file-service
-
 cloudinary:
   name: <>
   key: <>
