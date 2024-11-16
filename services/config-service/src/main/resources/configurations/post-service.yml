@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    url: "jdbc:mysql://${mysqldb:localhost}:3306/post"
+    driverClassName: com.mysql.cj.jdbc.Driver
+    username: root
+    password: Admin@123
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+application:
+  config:
+    file-url: http://localhost:8084/file
+    location-url: http://localhost:8086/location
+    payment-url: http://localhost:8087/payment
+
+server:
+  port: 8085
+  servlet:
+    context-path: /post
