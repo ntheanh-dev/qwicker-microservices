@@ -46,15 +46,15 @@ public class AuthenticationService {
     InvalidatedTokenRepository invalidatedTokenRepository;
 
     @NonFinal
-    @Value("${jwt.signerKey}")
+    @Value("${application.config.jwt.signerKey}")
     protected String SIGNER_KEY;
 
     @NonFinal
-    @Value("${jwt.valid-duration}")
+    @Value("${application.config.jwt.valid-duration}")
     protected long VALID_DURATION;
 
     @NonFinal
-    @Value("${jwt.refreshable-duration}")
+    @Value("${application.config.jwt.refreshable-duration}")
     protected long REFRESHABLE_DURATION;
 
     public IntrospectResponse introspect(final IntrospectRequest request) throws JOSEException, ParseException {

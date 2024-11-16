@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.nta.profileservice.dto.request.UploadImageRequest;
 import com.nta.profileservice.dto.response.UploadImageResponse;
 
-@FeignClient(name = "file-service", url = "http://localhost:8084/file")
+@FeignClient(name = "file-service", url = "${application.config.file-url}")
 public interface FileClient {
     @PostMapping(value = "/internal/images", produces = MediaType.APPLICATION_JSON_VALUE)
     UploadImageResponse uploadImage(@RequestBody UploadImageRequest request);

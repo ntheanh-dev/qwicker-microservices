@@ -15,7 +15,7 @@ import com.nta.identity.service.AuthenticationService;
 
 @Component
 public class CustomJwtDecoder implements JwtDecoder {
-    @Value("${jwt.signerKey}")
+    @Value("${application.config.jwt.signerKey}")
     private String signerKey;
 
     @Autowired

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.nta.identity.dto.request.ShipperProfileCreationRequest;
 import com.nta.identity.dto.request.UserProfileCreationRequest;
 
-@FeignClient(name = "profile-service", url = "http://localhost:8081/profile")
+@FeignClient(name = "profile-service", url = "${application.config.profile-url}")
 public interface ProfileClient {
     @PostMapping(value = "/internal/users", produces = MediaType.APPLICATION_JSON_VALUE)
     Object createUserProfile(@RequestBody UserProfileCreationRequest userProfileCreationRequest);
