@@ -1,6 +1,5 @@
 package com.nta.postservice.exception;
 
-
 import com.nta.postservice.enums.ErrorCode;
 
 public class AppException extends RuntimeException {

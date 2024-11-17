@@ -1,12 +1,15 @@
 package com.nta.postservice.entity;
-import com.nta.postservice.enums.ShipperPostStatus;
+
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
+
+import com.nta.postservice.enums.ShipperPostStatus;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -18,10 +21,13 @@ public class ShipperPost {
     @Id
     @Column(name = "shipper", nullable = false)
     String shipper;
+
     @Id
     @Column(name = "post", nullable = false)
     String post;
+
     @Enumerated(EnumType.STRING)
     ShipperPostStatus status;
+
     LocalDateTime joinedAt;
 }

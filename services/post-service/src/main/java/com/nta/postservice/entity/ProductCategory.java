@@ -1,6 +1,7 @@
 package com.nta.postservice.entity;
 
 import jakarta.persistence.*;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -16,5 +17,6 @@ public class ProductCategory {
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "product_categoy_id", nullable = false)
     String id;
+
     String name;
 }

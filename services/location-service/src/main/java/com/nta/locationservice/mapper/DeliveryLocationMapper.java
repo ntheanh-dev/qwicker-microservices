@@ -1,8 +1,9 @@
 package com.nta.locationservice.mapper;
 
+import org.mapstruct.Mapper;
+
 import com.nta.locationservice.dto.request.DeliveryLocationCreationRequest;
 import com.nta.locationservice.entity.DeliveryLocation;
-import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface DeliveryLocationMapper {

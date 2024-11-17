@@ -1,6 +1,5 @@
 package com.nta.paymentservice.exception;
 
-
 import com.nta.paymentservice.enums.ErrorCode;
 
 public class AppException extends RuntimeException {

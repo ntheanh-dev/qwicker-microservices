@@ -1,12 +1,15 @@
 package com.nta.postservice.entity;
-import com.nta.postservice.enums.DeliveryTimeType;
-import com.nta.postservice.enums.PostStatus;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.Set;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+
+import com.nta.postservice.enums.DeliveryTimeType;
+import com.nta.postservice.enums.PostStatus;
+
+import lombok.*;
 
 @Entity
 @Setter
@@ -17,11 +20,13 @@ import java.util.Set;
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "post_id",nullable = false)
+    @Column(name = "post_id", nullable = false)
     String id;
+
     String description;
     LocalDateTime postTime;
     DeliveryTimeType deliveryTimeType;
+
     @Enumerated(EnumType.STRING)
     PostStatus status;
 
@@ -31,16 +36,18 @@ public class Post {
 
     @NotNull
     String pickupLocationId;
+
     LocalDateTime pickupDatetime;
 
     @NotNull
     String dropLocationId;
+
     LocalDateTime dropDateTime;
 
     String userId;
 
     String vehicleId;
 
-    @OneToMany(fetch = FetchType.EAGER,mappedBy = "post")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "post")
     Set<PostHistory> history;
 }

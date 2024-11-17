@@ -1,15 +1,16 @@
 package com.nta.postservice.dto.response;
 
+import java.time.LocalDateTime;
+import java.util.Set;
+
 import com.nta.postservice.dto.request.Payment;
 import com.nta.postservice.entity.PostHistory;
 import com.nta.postservice.entity.Product;
 import com.nta.postservice.enums.DeliveryTimeType;
 import com.nta.postservice.enums.PostStatus;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDateTime;
-import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -31,8 +32,8 @@ public class PostResponse {
     LocalDateTime dropDateTime;
 
     Payment payment;
-//    String userId;
+    //    String userId;
 
-//    String vehicleId;
+    //    String vehicleId;
     Set<PostHistory> history;
 }

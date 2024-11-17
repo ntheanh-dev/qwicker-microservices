@@ -1,16 +1,18 @@
 package com.nta.postservice.controller;
 
+import java.util.Map;
+
+import org.springframework.web.bind.annotation.*;
+
 import com.nta.postservice.dto.request.PostCreationRequest;
 import com.nta.postservice.dto.response.ApiResponse;
 import com.nta.postservice.dto.response.PostResponse;
 import com.nta.postservice.entity.Post;
 import com.nta.postservice.service.PostService;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/posts")
@@ -28,6 +30,8 @@ public class PostController {
 
     @GetMapping("/{id}")
     ApiResponse<PostResponse> findById(@RequestParam Map<String, String> params, @PathVariable String id) {
-        return ApiResponse.<PostResponse>builder().result(postService.findById(params, id)).build();
+        return ApiResponse.<PostResponse>builder()
+                .result(postService.findById(params, id))
+                .build();
     }
 }

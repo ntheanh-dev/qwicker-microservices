@@ -1,13 +1,15 @@
 package com.nta.locationservice.controller.internal;
 
+import org.springframework.web.bind.annotation.*;
+
 import com.nta.locationservice.dto.request.DeliveryLocationCreationRequest;
 import com.nta.locationservice.dto.response.ApiResponse;
 import com.nta.locationservice.entity.DeliveryLocation;
 import com.nta.locationservice.service.DeliveryLocationService;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/internal/delivery-locations")
 public class LocationController {
     DeliveryLocationService deliveryLocationService;
+
     @PostMapping()
     ApiResponse<DeliveryLocation> createLocation(@RequestBody DeliveryLocationCreationRequest deliveryLocation) {
         return ApiResponse.<DeliveryLocation>builder()
@@ -28,5 +31,4 @@ public class LocationController {
                 .result(deliveryLocationService.getDeliveryLocationById(id))
                 .build();
     }
-
 }

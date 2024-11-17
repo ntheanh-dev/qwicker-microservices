@@ -1,10 +1,11 @@
 package com.nta.postservice.dto.request;
 
+import java.math.BigDecimal;
+
 import com.nta.postservice.enums.PaymentMethod;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor

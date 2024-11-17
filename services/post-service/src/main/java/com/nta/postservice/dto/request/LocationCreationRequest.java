@@ -1,6 +1,5 @@
 package com.nta.postservice.dto.request;
 
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

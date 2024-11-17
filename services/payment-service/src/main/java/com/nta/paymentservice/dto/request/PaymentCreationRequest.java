@@ -1,10 +1,12 @@
 package com.nta.paymentservice.dto.request;
 
+import java.math.BigDecimal;
+
 import com.nta.paymentservice.enums.PaymentMethod;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

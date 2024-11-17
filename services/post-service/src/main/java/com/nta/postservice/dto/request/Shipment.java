@@ -1,12 +1,13 @@
 package com.nta.postservice.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.nta.postservice.enums.DeliveryTimeType;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.nta.postservice.enums.DeliveryTimeType;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Data
 @NoArgsConstructor
@@ -18,6 +19,7 @@ public class Shipment {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-M-d H:m")
     LocalDateTime pickupDatetime;
+
     DeliveryTimeType deliveryTimeType; // now or latter
     LocationCreationRequest pickupLocation;
     LocationCreationRequest dropLocation;

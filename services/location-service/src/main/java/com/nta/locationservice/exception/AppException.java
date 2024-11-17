@@ -1,6 +1,5 @@
 package com.nta.locationservice.exception;
 
-
 import com.nta.locationservice.enums.ErrorCode;
 
 public class AppException extends RuntimeException {
