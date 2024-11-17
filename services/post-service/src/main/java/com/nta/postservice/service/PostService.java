@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -116,20 +117,34 @@ public class PostService {
         return CompletableFuture.completedFuture(fileClient.uploadImage(request).getResult());
     }
 
-    public PostResponse findById(final String id) {
-        final var response = postRepository
-                .findById(id)
+    public PostResponse findById(final Map<String, String> params, final String id) {
+        Post p = null;
+        if(params.containsKey("status")) {
+            final PostStatus postStatus = convertToEnum(params.get("status"));
+            p = postRepository
+                .findPostByIdAndStatus(id, postStatus)
                 .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND));
-        return postMapper.toPostResponse(response);
+        } else {
+            p = postRepository
+                    .findById(id)
+                    .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND));
+        }
+        final var postResponse = postMapper.toPostResponse(p);
+        //---------------------Location------------------------
+        postResponse.setPickupLocation(locationClient.getDeliveryLocationById(p.getPickupLocationId()).getResult());
+        postResponse.setDropLocation(locationClient.getDeliveryLocationById(p.getDropLocationId()).getResult());
+        //---------------------Payment ------------------------
+        postResponse.setPayment(paymentClient.findByPostId(p.getId()).getResult());
+        return postResponse;
     }
 
-    public PostResponse getPostByStatus(final String status, final String postId) {
-        final PostStatus postStatus = convertToEnum(status);
-        final var response = postRepository
-                .findPostByIdAndStatus(postId, postStatus)
-                .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND));
-        return postMapper.toPostResponse(response);
-    }
+//    public PostResponse getPostByStatus(final String status, final String postId) {
+//        final PostStatus postStatus = convertToEnum(status);
+//        final var response = postRepository
+//                .findPostByIdAndStatus(postId, postStatus)
+//                .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND));
+//        return postMapper.toPostResponse(response);
+//    }
 
     private PostStatus convertToEnum(final String status) {
         try {

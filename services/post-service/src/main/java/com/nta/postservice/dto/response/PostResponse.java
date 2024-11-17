@@ -1,5 +1,6 @@
 package com.nta.postservice.dto.response;
 
+import com.nta.postservice.dto.request.Payment;
 import com.nta.postservice.entity.PostHistory;
 import com.nta.postservice.entity.Product;
 import com.nta.postservice.enums.DeliveryTimeType;
@@ -23,12 +24,13 @@ public class PostResponse {
     PostStatus status;
     Product product;
 
-//    String pickupLocationId;
+    DeliveryLocationResponse pickupLocation;
     LocalDateTime pickupDatetime;
 
-//    String dropLocationId;
+    DeliveryLocationResponse dropLocation;
     LocalDateTime dropDateTime;
 
+    Payment payment;
 //    String userId;
 
 //    String vehicleId;

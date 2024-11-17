@@ -9,7 +9,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class DeliveryLocationCreationResponse {
+public class DeliveryLocationResponse {
     String id;
     String contact;
     String phoneNumber;
