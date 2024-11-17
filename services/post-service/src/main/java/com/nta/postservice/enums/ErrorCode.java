@@ -15,6 +15,7 @@ public enum ErrorCode {
     PRODUCT_CATEGORY_NOT_FOUND(1009, "Product category not found", HttpStatus.BAD_REQUEST),
     POST_NOT_FOUND(1010, "Post not found", HttpStatus.NOT_FOUND),
     INVALID_POST_STATUS(1011, "Invalid post status", HttpStatus.BAD_REQUEST),
+    VEHICLE_NOT_FOUND(1012, "Vehicle not found", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

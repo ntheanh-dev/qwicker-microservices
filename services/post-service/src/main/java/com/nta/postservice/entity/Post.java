@@ -46,7 +46,9 @@ public class Post {
 
     String userId;
 
-    String vehicleId;
+    @ManyToOne
+    @JoinColumn(name="vehicle_id")
+    Vehicle vehicleType;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "post")
     Set<PostHistory> history;

@@ -28,7 +28,6 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ShipperProfileService {
     ShipperProfileRepository shipperProfileRepository;
-    VehicleService vehicleService;
     ProfileMapper profileMapper;
     ProfileRepository profileRepository;
     UserProfileService userProfileService;
@@ -36,7 +35,6 @@ public class ShipperProfileService {
 
     @Transactional
     public ShipperProfileResponse createShipperProfile(final ShipperProfileCreationRequest request) {
-        final Vehicle v = vehicleService.findVehicleById(request.getVehicleId());
         // TODO: Call to another service to upload images and receive urls
         final List<String> base64 =
                 List.of(request.getAvatarBase64(), request.getIdentityFBase64(), request.getIdentityFBase64());
@@ -51,7 +49,6 @@ public class ShipperProfileService {
         // Create shipper profile
         ShipperProfile shipperProfile = shipperProfileMapper.toShipperProfile(request);
         shipperProfile.setProfile(profile);
-        shipperProfile.setVehicle(v);
         shipperProfile.setIdentityF(ulrs.get(1));
         shipperProfile.setIdentityB(ulrs.get(2));
         shipperProfile = shipperProfileRepository.save(shipperProfile);

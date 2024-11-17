@@ -24,9 +24,7 @@ public class ShipperProfile {
     @Column(length = 15)
     String vehicleNumber;
 
-    @ManyToOne
-    @JoinColumn(name = "vehicle_id")
-    Vehicle vehicle;
+    String vehicleId;
 
     @Column(name = "identity_f", length = 120)
     String identityF;

@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+import com.nta.postservice.repository.*;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,10 +23,6 @@ import com.nta.postservice.enums.PostStatus;
 import com.nta.postservice.exception.AppException;
 import com.nta.postservice.mapper.PostMapper;
 import com.nta.postservice.mapper.ProductMapper;
-import com.nta.postservice.repository.PostHistoryRepository;
-import com.nta.postservice.repository.PostRepository;
-import com.nta.postservice.repository.ProductCategoryRepository;
-import com.nta.postservice.repository.ProductRepository;
 import com.nta.postservice.repository.httpClient.FileClient;
 import com.nta.postservice.repository.httpClient.LocationClient;
 import com.nta.postservice.repository.httpClient.PaymentClient;
@@ -48,6 +45,7 @@ public class PostService {
     PostRepository postRepository;
     ProductRepository productRepository;
     PostHistoryRepository postHistoryRepository;
+    VehicleRepository vehicleRepository;
     PostMapper postMapper;
 
     @Transactional
@@ -85,7 +83,10 @@ public class PostService {
                 .pickupLocationId(pickupLocationId)
                 .product(savedProd)
                 .deliveryTimeType(request.getShipment().getDeliveryTimeType())
-                .vehicleId(request.getOrder().getVehicleId())
+                .vehicleType(
+                        vehicleRepository
+                                .findById(request.getOrder().getVehicleId())
+                                .orElseThrow(() -> new AppException(ErrorCode.VEHICLE_NOT_FOUND)))
                 .postTime(LocalDateTime.now())
                 .status(
                         request.getPayment().getMethod().equals(PaymentMethod.CASH)

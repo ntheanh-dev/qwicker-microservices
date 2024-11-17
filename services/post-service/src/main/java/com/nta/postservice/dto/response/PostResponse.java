@@ -6,6 +6,7 @@ import java.util.Set;
 import com.nta.postservice.dto.request.Payment;
 import com.nta.postservice.entity.PostHistory;
 import com.nta.postservice.entity.Product;
+import com.nta.postservice.entity.Vehicle;
 import com.nta.postservice.enums.DeliveryTimeType;
 import com.nta.postservice.enums.PostStatus;
 
@@ -30,6 +31,8 @@ public class PostResponse {
 
     DeliveryLocationResponse dropLocation;
     LocalDateTime dropDateTime;
+
+    Vehicle vehicleType;
 
     Payment payment;
     //    String userId;
