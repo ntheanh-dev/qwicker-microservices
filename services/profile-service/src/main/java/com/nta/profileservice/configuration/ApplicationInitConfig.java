@@ -5,8 +5,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.nta.profileservice.entity.Vehicle;
-
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -24,8 +22,6 @@ public class ApplicationInitConfig {
             value = "datasource.driverClassName",
             havingValue = "com.mysql.cj.jdbc.Driver")
     ApplicationRunner initApplicationRunner() {
-        return args -> {
-
-        };
+        return args -> {};
     }
 }

@@ -47,7 +47,7 @@ public class Post {
     String userId;
 
     @ManyToOne
-    @JoinColumn(name="vehicle_id")
+    @JoinColumn(name = "vehicle_id")
     Vehicle vehicleType;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "post")

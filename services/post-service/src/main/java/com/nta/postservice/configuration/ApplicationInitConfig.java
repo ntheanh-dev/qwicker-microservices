@@ -1,14 +1,14 @@
 package com.nta.postservice.configuration;
 
-import com.nta.postservice.entity.Vehicle;
-import com.nta.postservice.repository.VehicleRepository;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.nta.postservice.entity.ProductCategory;
+import com.nta.postservice.entity.Vehicle;
 import com.nta.postservice.repository.ProductCategoryRepository;
+import com.nta.postservice.repository.VehicleRepository;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,8 @@ public class ApplicationInitConfig {
             prefix = "spring",
             value = "datasource.driverClassName",
             havingValue = "com.mysql.cj.jdbc.Driver")
-    ApplicationRunner initApplicationRunner(ProductCategoryRepository productCategoryRepository, VehicleRepository vehicleRepository) {
+    ApplicationRunner initApplicationRunner(
+            ProductCategoryRepository productCategoryRepository, VehicleRepository vehicleRepository) {
         return args -> {
             if (productCategoryRepository.count() == 0) {
                 log.info("Initializing product category");
@@ -44,7 +45,7 @@ public class ApplicationInitConfig {
                 productCategoryRepository.save(
                         ProductCategory.builder().name("Đồ gia dụng / Nội thất").build());
             }
-            if(vehicleRepository.count() == 0) {
+            if (vehicleRepository.count() == 0) {
                 log.info("Initializing vehicle type");
                 vehicleRepository.save(Vehicle.builder()
                         .id("1")

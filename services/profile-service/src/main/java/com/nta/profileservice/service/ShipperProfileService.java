@@ -10,7 +10,6 @@ import com.nta.profileservice.dto.request.ShipperProfileCreationRequest;
 import com.nta.profileservice.dto.response.ShipperProfileResponse;
 import com.nta.profileservice.entity.Profile;
 import com.nta.profileservice.entity.ShipperProfile;
-import com.nta.profileservice.entity.Vehicle;
 import com.nta.profileservice.enums.ErrorCode;
 import com.nta.profileservice.enums.ProfileType;
 import com.nta.profileservice.exception.AppException;

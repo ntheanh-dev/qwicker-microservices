@@ -46,6 +46,8 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
         "/identity/accounts/registration/.*",
         "/identity/accounts/check-username-exists",
         "/identity/accounts/check-email-exists",
+        "/post/vehicles",
+        "/post/product-category",
     };
 
     @Override
