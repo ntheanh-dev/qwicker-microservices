@@ -17,7 +17,7 @@ public class UploadImageRequest {
     @NotNull
     private Boolean isMultiple;
 
-    String base64;
+    byte[] base64;
 
-    private List<String> base64List;
+    private List<byte []> base64List;
 }

@@ -17,7 +17,7 @@ public class UserProfileCreationRequest {
     String lastName;
 
     @NotNull(message = "AVATAR_BASE64_REQUIRED")
-    String avatarBase64;
+    byte[] avatarBase64;
 
     ProfileType profileType;
 }

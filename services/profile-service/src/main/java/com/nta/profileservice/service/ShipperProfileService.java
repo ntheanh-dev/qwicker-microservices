@@ -35,7 +35,7 @@ public class ShipperProfileService {
     @Transactional
     public ShipperProfileResponse createShipperProfile(final ShipperProfileCreationRequest request) {
         // TODO: Call to another service to upload images and receive urls
-        final List<String> base64 =
+        final List<byte []> base64 =
                 List.of(request.getAvatarBase64(), request.getIdentityFBase64(), request.getIdentityFBase64());
         final List<String> ulrs = List.of("http:example1.com", "http:example2.com", "http:example3.com");
 

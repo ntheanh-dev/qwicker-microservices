@@ -3,6 +3,7 @@ package com.nta.identity.service;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import jakarta.transaction.Transactional;
 
@@ -153,7 +154,7 @@ public class AccountService {
         kafkaTemplate.send("notification-sent-otp", notificationEvent);
     }
 
-    public void verifyOTP(final OTPverifyRequest request) {
+    public void verifyOTP(final OTPVerifyRequest request) {
         if (!redisService.isRedisLive()) {
             throw new AppException(ErrorCode.REDIS_SERVER_UNAVAILABLE);
         }
@@ -165,5 +166,9 @@ public class AccountService {
         } else {
             throw new AppException(ErrorCode.OTP_NOT_FOUND);
         }
+    }
+
+    public List<Account> findAllById(final Set<String> ids) {
+        return accountRepository.findAllById(ids);
     }
 }

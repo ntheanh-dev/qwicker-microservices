@@ -43,7 +43,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     @NonFinal
     private String[] PUBLIC_ENDPOINTS = new String[] {
         "/identity/auth/.*",
-        "/identity/accounts/registration/.*",
+        "/identity/accounts/registration",
         "/identity/accounts/check-username-exists",
         "/identity/accounts/check-email-exists",
         "/post/vehicles",

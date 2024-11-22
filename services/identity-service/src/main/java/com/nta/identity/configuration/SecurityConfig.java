@@ -24,6 +24,7 @@ public class SecurityConfig {
         "/accounts/registration/verify-otp",
         "/accounts/check-username-exists",
         "/accounts/check-email-exists",
+        "/internal/accounts/find-by-ids",
         "/auth/token",
         "/auth/introspect",
         "/auth/logout",

@@ -25,7 +25,7 @@ public class AccountCreationRequest {
     String lastName;
 
     @NotNull(message = "AVATAR_BASE64_REQUIRED")
-    String avatarBase64;
+    byte[] avatarBase64;
 
     @NotNull(message = "PROFILE_TYPE_REQUIRED")
     ProfileType profileType;
@@ -37,6 +37,6 @@ public class AccountCreationRequest {
     // profile-service will be responsible for validating
     String vehicleNumber;
     String vehicleId;
-    String identityFBase64;
-    String identityBBase64;
+    byte[] identityFBase64;
+    byte[] identityBBase64;
 }

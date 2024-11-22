@@ -1,7 +1,5 @@
 package com.nta.profileservice.dto.response;
 
-import com.nta.profileservice.entity.Vehicle;
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -13,7 +11,7 @@ import lombok.experimental.FieldDefaults;
 public class ShipperProfileResponse {
     UserProfileResponse profile;
     String vehicleNumber;
-    Vehicle vehicle;
+    String vehicleId;
     String identityF;
     String identityB;
 }

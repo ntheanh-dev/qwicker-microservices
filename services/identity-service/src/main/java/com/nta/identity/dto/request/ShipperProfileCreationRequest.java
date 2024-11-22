@@ -17,11 +17,11 @@ public class ShipperProfileCreationRequest {
     String vehicleId;
 
     @NotNull(message = "AVATAR_BASE64_REQUIRED")
-    String avatarBase64;
+    byte[] avatarBase64;
 
     @NotNull(message = "IDENTITY_FRONT_BASE64_REQUIRED")
-    String identityFBase64;
+    byte[] identityFBase64;
 
     @NotNull(message = "IDENTITY_BACK_BASE64_REQUIRED")
-    String identityBBase64;
+    byte[] identityBBase64;
 }

@@ -29,11 +29,11 @@ public class UserProfileService {
     public UserProfileResponse createUserProfile(final UserProfileCreationRequest request) {
         Profile userProfile = profileMapper.toUserProfile(request);
         // Call file-service to upload avatar
-        final UploadImageResponse uploadImageResponse = fileClient.uploadImage(UploadImageRequest.builder()
-                .isMultiple(false)
-                .base64(request.getAvatarBase64())
-                .build());
-        userProfile.setAvatar(uploadImageResponse.getUrl());
+//        final UploadImageResponse uploadImageResponse = fileClient.uploadImage(UploadImageRequest.builder()
+//                .isMultiple(false)
+//                .base64(request.getAvatarBase64())
+//                .build());
+//        userProfile.setAvatar(uploadImageResponse.getUrl());
         userProfile = profileRepository.save(userProfile);
         return profileMapper.toUserProfileResponse(userProfile);
     }

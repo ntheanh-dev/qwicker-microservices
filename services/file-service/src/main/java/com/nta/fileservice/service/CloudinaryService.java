@@ -26,31 +26,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CloudinaryService {
     Cloudinary cloudinary;
-
-    public Map upload(MultipartFile file) {
-        try {
-            return this.cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("resource_type", "auto"));
-        } catch (Exception e) {
-            log.error("Cannot upload file: ", e);
-            throw new AppException(ErrorCode.UPLOAD_FILE_FAILED);
-        }
-    }
-
-    public Map upload(byte[] b) {
-        try {
-            return this.cloudinary.uploader().upload(b, ObjectUtils.asMap("resource_type", "auto"));
-        } catch (Exception e) {
-            log.error("Cannot upload file: ", e);
-            throw new AppException(ErrorCode.UPLOAD_FILE_FAILED);
-        }
-    }
-
-    public String uploadImage(final String base64) {
-        byte[] bytes = Base64.getDecoder().decode(base64.getBytes());
+    public String uploadImage(final byte[] base64) {
         try {
             return this.cloudinary
                     .uploader()
-                    .upload(bytes, ObjectUtils.asMap("resource_type", "auto"))
+                    .upload(base64, ObjectUtils.asMap("resource_type", "auto"))
                     .get("secure_url")
                     .toString();
         } catch (Exception e) {
@@ -59,10 +39,10 @@ public class CloudinaryService {
         }
     }
 
-    public List<String> uploadImages(final List<String> base64List) {
+    public List<String> uploadImages(final List<byte []> base64List) {
         final List<CompletableFuture<String>> futures = new ArrayList<>();
 
-        for (String base64 : base64List) {
+        for (byte[] base64 : base64List) {
             CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> this.uploadImage(base64));
             futures.add(future);
         }

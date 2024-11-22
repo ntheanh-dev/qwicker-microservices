@@ -23,8 +23,9 @@ public class ShipperPost {
     String shipper;
 
     @Id
-    @Column(name = "post", nullable = false)
-    String post;
+    @ManyToOne
+    @JoinColumn(name = "post_id",nullable = false)
+    Post post;
 
     @Enumerated(EnumType.STRING)
     ShipperPostStatus status;

@@ -27,7 +27,7 @@ public class AccountController {
     AccountService accountService;
 
     @PostMapping("/registration")
-    ApiResponse<AccountResponse> createUser(@RequestBody @Valid AccountCreationRequest request) {
+    ApiResponse<AccountResponse> createUser(@ModelAttribute @Valid AccountCreationRequest request) {
         return ApiResponse.<AccountResponse>builder()
                 .result(accountService.createAccount(request))
                 .build();
@@ -40,7 +40,7 @@ public class AccountController {
     }
 
     @PostMapping("/registration/verify-otp")
-    ApiResponse<?> verifyOtp(@RequestBody @Valid OTPverifyRequest request) {
+    ApiResponse<?> verifyOtp(@RequestBody @Valid OTPVerifyRequest request) {
         accountService.verifyOTP(request);
         return ApiResponse.builder().build();
     }
@@ -82,14 +82,14 @@ public class AccountController {
     }
 
     @PostMapping("/check-username-exists")
-    ApiResponse<DataExistResponse> checkIfUsernameExists(@RequestBody @Valid CheckUsernameExistsRequest request) {
+    ApiResponse<DataExistResponse> checkIfUsernameExists(@ModelAttribute @Valid CheckUsernameExistsRequest request) {
         return ApiResponse.<DataExistResponse>builder()
                 .result(accountService.checkIfUsernameExist(request))
                 .build();
     }
 
     @PostMapping("/check-email-exists")
-    ApiResponse<DataExistResponse> checkIfEmailExists(@RequestBody @Valid CheckEmailExistsRequest request) {
+    ApiResponse<DataExistResponse> checkIfEmailExists(@ModelAttribute @Valid CheckEmailExistsRequest request) {
         return ApiResponse.<DataExistResponse>builder()
                 .result(accountService.checkIfEmailExist(request))
                 .build();
