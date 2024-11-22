@@ -1,0 +1,10 @@
+application:
+  config:
+    identity-url: http://localhost:8082/identity
+    jwt:
+      signerKey: "akdXchw5FloESb63Kc+DFhTARvpkowiUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij"
+
+server:
+  port: 8088
+  servlet:
+    context-path: /websocket
