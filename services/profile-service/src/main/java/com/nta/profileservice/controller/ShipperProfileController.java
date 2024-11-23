@@ -17,9 +17,9 @@ import lombok.experimental.FieldDefaults;
 public class ShipperProfileController {
     ShipperProfileService shipperProfileService;
 
-    @GetMapping
-    ApiResponse<ShipperProfileResponse> getShipperProfile(@RequestParam(value = "accountId") String accountId) {
-        final var response = shipperProfileService.getShipperProfile(accountId);
+    @GetMapping("/my-profile")
+    ApiResponse<ShipperProfileResponse> getShipperProfile() {
+        final var response = shipperProfileService.getShipperProfile();
         return ApiResponse.<ShipperProfileResponse>builder().result(response).build();
     }
 }

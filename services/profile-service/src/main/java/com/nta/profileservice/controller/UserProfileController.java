@@ -17,11 +17,10 @@ import lombok.experimental.FieldDefaults;
 public class UserProfileController {
     UserProfileService userProfileService;
 
-    @GetMapping
+    @GetMapping("/my-profile")
     ApiResponse<UserProfileResponse> getProfileByAccountId(
-            @RequestParam(value = "accountId") String accountId,
-            @RequestParam(value = "profileType", defaultValue = "DEFAULT") String profileType) {
-        final var response = userProfileService.getUserProfileByAccountIdAndProfileType(accountId, profileType);
+            @RequestParam(value = "type", defaultValue = "DEFAULT") String profileType) {
+        final var response = userProfileService.getMyProfileByType(profileType);
 
         return ApiResponse.<UserProfileResponse>builder().result(response).build();
     }

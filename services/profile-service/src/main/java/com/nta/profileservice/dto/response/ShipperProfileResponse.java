@@ -9,6 +9,7 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ShipperProfileResponse {
+    String accountId;
     UserProfileResponse profile;
     String vehicleNumber;
     String vehicleId;

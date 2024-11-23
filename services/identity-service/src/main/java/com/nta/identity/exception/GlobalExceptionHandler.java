@@ -74,8 +74,7 @@ public class GlobalExceptionHandler {
         ApiResponse apiResponse = new ApiResponse();
         apiResponse.setMessage(message);
         apiResponse.setCode(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode());
-        if (exception.getCause() instanceof InvalidFormatException) {
-            final InvalidFormatException invalidFormatException = (InvalidFormatException) exception.getCause();
+        if (exception.getCause() instanceof InvalidFormatException invalidFormatException) {
             if (invalidFormatException.getTargetType().equals(ProfileType.class)) {
                 apiResponse.setCode(ErrorCode.INVALID_PROFILE_TYPE.getCode());
                 apiResponse.setMessage(ErrorCode.INVALID_PROFILE_TYPE.getMessage() + ". Except values: "

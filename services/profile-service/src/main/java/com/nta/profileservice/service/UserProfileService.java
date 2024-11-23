@@ -1,5 +1,7 @@
 package com.nta.profileservice.service;
 
+import com.nta.profileservice.model.AuthenticatedUserDetail;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import com.nta.profileservice.dto.request.UploadImageRequest;
@@ -21,11 +23,12 @@ import lombok.experimental.FieldDefaults;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class UserProfileService {
     ProfileRepository profileRepository;
     ProfileMapper profileMapper;
     FileClient fileClient;
-
+    AuthenticationService authenticationService;
     public UserProfileResponse createUserProfile(final UserProfileCreationRequest request) {
         Profile userProfile = profileMapper.toUserProfile(request);
         // Call file-service to upload avatar
@@ -38,12 +41,14 @@ public class UserProfileService {
         return profileMapper.toUserProfileResponse(userProfile);
     }
 
-    public UserProfileResponse getUserProfileByAccountIdAndProfileType(
-            final String accountId, final String profileType) {
+    public UserProfileResponse getMyProfileByType(final String profileType) {
+        final AuthenticatedUserDetail user = authenticationService.getAuthenticatedUserDetailFromToken();
         final var profile = profileRepository
-                .findByAccountIdAndProfileType(accountId, ProfileType.valueOf(profileType))
+                .findByAccountIdAndProfileType(user.getId(), ProfileType.valueOf(profileType))
                 .orElseThrow(() -> new AppException(ErrorCode.PROFILE_NOT_FOUND));
-        return profileMapper.toUserProfileResponse(profile);
+        final var profileResponse = profileMapper.toUserProfileResponse(profile);
+        profileResponse.setAccountId(user.getId());
+        return profileResponse;
     }
 
     public Profile findByAccountId(final String accountId) {

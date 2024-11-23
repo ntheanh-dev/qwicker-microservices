@@ -2,6 +2,7 @@ package com.nta.profileservice.service;
 
 import java.util.List;
 
+import com.nta.profileservice.model.AuthenticatedUserDetail;
 import jakarta.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
@@ -30,7 +31,8 @@ public class ShipperProfileService {
     ProfileMapper profileMapper;
     ProfileRepository profileRepository;
     UserProfileService userProfileService;
-    private final ShipperProfileMapper shipperProfileMapper;
+    ShipperProfileMapper shipperProfileMapper;
+    AuthenticationService authenticationService;
 
     @Transactional
     public ShipperProfileResponse createShipperProfile(final ShipperProfileCreationRequest request) {
@@ -54,8 +56,9 @@ public class ShipperProfileService {
         return shipperProfileMapper.toShipperProfileResponse(shipperProfile);
     }
 
-    public ShipperProfileResponse getShipperProfile(final String accountId) {
-        final Profile profile = userProfileService.findByAccountId(accountId);
+    public ShipperProfileResponse getShipperProfile() {
+        final AuthenticatedUserDetail shipper = authenticationService.getAuthenticatedUserDetailFromToken();
+        final Profile profile = userProfileService.findByAccountId(shipper.getId());
         final ShipperProfile shipperProfile = shipperProfileRepository
                 .findByProfileId(profile.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.PROFILE_NOT_FOUND));
@@ -63,6 +66,7 @@ public class ShipperProfileService {
         final ShipperProfileResponse shipperProfileResponse =
                 shipperProfileMapper.toShipperProfileResponse(shipperProfile);
         shipperProfileResponse.setProfile(profileMapper.toUserProfileResponse(profile));
+        shipperProfileResponse.setAccountId(shipper.getId());
         return shipperProfileResponse;
     }
 

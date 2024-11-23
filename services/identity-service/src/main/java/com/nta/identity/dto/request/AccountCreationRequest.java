@@ -24,7 +24,7 @@ public class AccountCreationRequest {
     String firstName;
     String lastName;
 
-    @NotNull(message = "AVATAR_BASE64_REQUIRED")
+//    @NotNull(message = "AVATAR_BASE64_REQUIRED")
     byte[] avatarBase64;
 
     @NotNull(message = "PROFILE_TYPE_REQUIRED")
