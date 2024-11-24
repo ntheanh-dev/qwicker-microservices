@@ -8,8 +8,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @EnableFeignClients
 public class WebsocketApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(WebsocketApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        SpringApplication.run(WebsocketApplication.class, args);
+    }
 }

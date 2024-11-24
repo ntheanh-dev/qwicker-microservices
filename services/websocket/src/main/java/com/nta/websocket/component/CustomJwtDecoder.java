@@ -1,14 +1,16 @@
 package com.nta.websocket.component;
 
-import com.nimbusds.jwt.SignedJWT;
-import lombok.extern.slf4j.Slf4j;
+import java.text.ParseException;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Component;
 
-import java.text.ParseException;
+import com.nimbusds.jwt.SignedJWT;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j

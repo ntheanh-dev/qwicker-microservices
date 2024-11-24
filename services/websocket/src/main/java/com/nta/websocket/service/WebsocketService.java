@@ -1,29 +1,33 @@
 package com.nta.websocket.service;
 
+import java.security.Principal;
+import java.util.*;
+
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.stereotype.Service;
+
 import com.nta.websocket.dto.response.Account;
 import com.nta.websocket.model.AuthenticatedAccountDetail;
 import com.nta.websocket.repository.httpClient.IdentityClient;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.stereotype.Service;
-
-import java.security.Principal;
-import java.util.*;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class WebsocketService {
     @NonFinal
     Set<String> onlineAccounts;
+
     @NonFinal
     Map<String, Set<String>> accountSubscribed;
+
     IdentityClient identityClient;
 
     public void addOnlineAccount(Principal user) {
@@ -48,7 +52,8 @@ public class WebsocketService {
 
     public Map<String, Set<String>> getAccountSubscribed() {
         Map<String, Set<String>> result = new HashMap<>();
-        List<Account> users = identityClient.findAllAccountsByIds(accountSubscribed.keySet()).getResult();
+        List<Account> users =
+                identityClient.findAllAccountsByIds(accountSubscribed.keySet()).getResult();
         users.forEach(user -> result.put(user.getUsername(), accountSubscribed.get(user.getId())));
         return result;
     }
@@ -79,10 +84,6 @@ public class WebsocketService {
         final Jwt jwt = (Jwt) jwtAuthenticationToken.getCredentials();
         final String subject = jwt.getSubject();
         final String userId = jwt.getClaim("user_id");
-        return AuthenticatedAccountDetail.builder()
-                .id(userId)
-                .username(subject)
-                .build();
+        return AuthenticatedAccountDetail.builder().id(userId).username(subject).build();
     }
-    
 }
