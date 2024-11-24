@@ -15,7 +15,7 @@ import lombok.experimental.FieldDefaults;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequestMapping("/internal/delivery-locations")
-public class LocationController {
+public class InternalLocationController {
     DeliveryLocationService deliveryLocationService;
 
     @PostMapping()

@@ -12,6 +12,7 @@ public enum ErrorCode {
     UNAUTHENTICATED(1006, "Unauthenticated", HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(1007, "You do not have permission", HttpStatus.FORBIDDEN),
     LOCATION_NOT_FOUND(1008, "Location not found", HttpStatus.NOT_FOUND),
+    CANNOT_FIND_SHIPPER_IN_REDIS(1009, "Can't find shipper in redis", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
