@@ -1,5 +1,6 @@
 package com.nta.postservice.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.web.bind.annotation.*;
@@ -33,5 +34,18 @@ public class PostController {
         return ApiResponse.<PostResponse>builder()
                 .result(postService.findById(params, id))
                 .build();
+    }
+
+    @GetMapping
+    ApiResponse<List<PostResponse>> getAllUserPosts(
+            @RequestParam(value = "status", required = false) String statusList) {
+        List<PostResponse> response;
+        try {
+            response = postService.getPostsByStatusList(statusList);
+        } catch (IllegalArgumentException e) {
+            response = List.of();
+        }
+
+        return ApiResponse.<List<PostResponse>>builder().result(response).build();
     }
 }

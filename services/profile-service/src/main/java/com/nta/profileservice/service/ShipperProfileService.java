@@ -2,7 +2,6 @@ package com.nta.profileservice.service;
 
 import java.util.List;
 
-import com.nta.profileservice.model.AuthenticatedUserDetail;
 import jakarta.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
@@ -16,6 +15,7 @@ import com.nta.profileservice.enums.ProfileType;
 import com.nta.profileservice.exception.AppException;
 import com.nta.profileservice.mapper.ProfileMapper;
 import com.nta.profileservice.mapper.ShipperProfileMapper;
+import com.nta.profileservice.model.AuthenticatedUserDetail;
 import com.nta.profileservice.repository.ProfileRepository;
 import com.nta.profileservice.repository.ShipperProfileRepository;
 
@@ -37,7 +37,7 @@ public class ShipperProfileService {
     @Transactional
     public ShipperProfileResponse createShipperProfile(final ShipperProfileCreationRequest request) {
         // TODO: Call to another service to upload images and receive urls
-        final List<byte []> base64 =
+        final List<byte[]> base64 =
                 List.of(request.getAvatarBase64(), request.getIdentityFBase64(), request.getIdentityFBase64());
         final List<String> ulrs = List.of("http:example1.com", "http:example2.com", "http:example3.com");
 

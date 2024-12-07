@@ -1,8 +1,11 @@
 package com.nta.postservice.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.nta.postservice.entity.Post;
@@ -28,7 +31,14 @@ public interface PostRepository extends JpaRepository<Post, String> {
     //  List<Post> findPostsByLatestStatus(
     //      @Param("userId") String userId, @Param("status") PostStatus status);
     //
+
+    @Query("SELECT p FROM Post p WHERE p.userId = :userId")
+    List<Post> findPostsByUserId(@Param("userId") String userId);
+
     Optional<Post> findPostByIdAndStatus(String postId, PostStatus status);
+
+    @Query("SELECT p FROM Post p WHERE p.userId = :userId AND p.status IN :statusList")
+    List<Post> findPostsByStatus(@Param("userId") String userId, @Param("statusList") List<PostStatus> statusList);
     //
     //  @Query("SELECT p FROM Post p WHERE p.user.id = :userId AND p.status IN :statusList")
     //  List<Post> findPostsByStatus(

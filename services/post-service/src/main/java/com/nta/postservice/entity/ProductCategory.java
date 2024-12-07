@@ -14,7 +14,6 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 public class ProductCategory {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "product_categoy_id", nullable = false)
     String id;
 

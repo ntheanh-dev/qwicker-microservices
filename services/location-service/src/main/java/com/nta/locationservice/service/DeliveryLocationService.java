@@ -1,5 +1,7 @@
 package com.nta.locationservice.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.nta.locationservice.dto.request.DeliveryLocationCreationRequest;
@@ -25,6 +27,11 @@ public class DeliveryLocationService {
     public DeliveryLocation createDeliveryLocation(final DeliveryLocationCreationRequest request) {
         final DeliveryLocation deliveryLocation = deliveryLocationMapper.toLocation(request);
         return deliveryLocationRepository.save(deliveryLocation);
+    }
+
+    public List<DeliveryLocation> findAllByIdList(List<String> ids) {
+        log.info(String.valueOf(deliveryLocationRepository.findAllByIdList(ids).size()));
+        return deliveryLocationRepository.findAllByIdList(ids);
     }
 
     public DeliveryLocation getDeliveryLocationById(final String id) {

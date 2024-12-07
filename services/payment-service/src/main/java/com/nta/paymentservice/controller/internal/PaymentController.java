@@ -1,5 +1,7 @@
 package com.nta.paymentservice.controller.internal;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.*;
 
 import com.nta.paymentservice.dto.request.PaymentCreationRequest;
@@ -31,6 +33,13 @@ public class PaymentController {
     ApiResponse<Payment> findByPostId(@RequestParam(value = "postId", required = false) String postId) {
         return ApiResponse.<Payment>builder()
                 .result(paymentService.findByPostId(postId))
+                .build();
+    }
+
+    @PostMapping("/find-by-posts")
+    ApiResponse<List<Payment>> findByPostIds(@RequestBody List<String> postIds) {
+        return ApiResponse.<List<Payment>>builder()
+                .result(paymentService.findByPostIds(postIds))
                 .build();
     }
 }

@@ -1,5 +1,7 @@
 package com.nta.paymentservice.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.nta.paymentservice.dto.request.PaymentCreationRequest;
@@ -28,5 +30,9 @@ public class PaymentService {
 
     public Payment findByPostId(final String postId) {
         return paymentRepository.findByPostId(postId).orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
+    }
+
+    public List<Payment> findByPostIds(final List<String> postIds) {
+        return paymentRepository.findByPostIds(postIds);
     }
 }

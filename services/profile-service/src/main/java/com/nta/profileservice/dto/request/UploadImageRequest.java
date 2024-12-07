@@ -18,5 +18,5 @@ public class UploadImageRequest {
 
     byte[] base64;
 
-    private List<byte []> base64List;
+    private List<byte[]> base64List;
 }

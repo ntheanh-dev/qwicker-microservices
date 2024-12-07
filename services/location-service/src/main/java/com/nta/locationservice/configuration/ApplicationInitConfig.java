@@ -1,4 +1,4 @@
-package com.nta.notification.configuration;
+package com.nta.locationservice.configuration;
 
 import org.springframework.context.annotation.Configuration;
 

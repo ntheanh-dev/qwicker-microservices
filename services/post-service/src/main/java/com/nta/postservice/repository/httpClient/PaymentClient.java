@@ -1,5 +1,7 @@
 package com.nta.postservice.repository.httpClient;
 
+import java.util.List;
+
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,4 +23,7 @@ public interface PaymentClient {
 
     @GetMapping(value = "/internal/payments", produces = MediaType.APPLICATION_JSON_VALUE)
     ApiResponse<Payment> findByPostId(@RequestParam String postId);
+
+    @GetMapping(value = "/internal/payments/find-by-posts", produces = MediaType.APPLICATION_JSON_VALUE)
+    ApiResponse<List<Payment>> findByPostIds(@RequestBody List<String> postIds);
 }

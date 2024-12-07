@@ -1,6 +1,8 @@
 package com.nta.postservice.service;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -11,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.nta.postservice.dto.request.Payment;
 import com.nta.postservice.dto.request.PostCreationRequest;
 import com.nta.postservice.dto.request.UploadImageRequest;
+import com.nta.postservice.dto.response.DeliveryLocationResponse;
 import com.nta.postservice.dto.response.PostResponse;
 import com.nta.postservice.dto.response.UploadImageResponse;
 import com.nta.postservice.entity.Post;
@@ -47,6 +50,7 @@ public class PostService {
     PostHistoryRepository postHistoryRepository;
     VehicleRepository vehicleRepository;
     PostMapper postMapper;
+    AuthenticationService authenticationService;
 
     @Transactional
     public Post createPost(final PostCreationRequest request) {
@@ -75,9 +79,10 @@ public class PostService {
                 .getResult()
                 .getId();
         // TODO Call payment server to persist payment data
-
+        log.info(authenticationService.getUserDetail().getId());
         // ---------------Post----------------------
         final Post post = postRepository.save(Post.builder()
+                .userId(authenticationService.getUserDetail().getId())
                 .description(request.getOrder().getDescription())
                 .dropLocationId(dropLocationId)
                 .pickupLocationId(pickupLocationId)
@@ -136,13 +141,43 @@ public class PostService {
         return postResponse;
     }
 
-    //    public PostResponse getPostByStatus(final String status, final String postId) {
-    //        final PostStatus postStatus = convertToEnum(status);
-    //        final var response = postRepository
-    //                .findPostByIdAndStatus(postId, postStatus)
-    //                .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND));
-    //        return postMapper.toPostResponse(response);
-    //    }
+    public List<PostResponse> getPostsByStatusList(final String statusList) {
+        final var currentUser = authenticationService.getUserDetail();
+        if (statusList == null || statusList.isEmpty()) {
+            return postMapper.toPostResponseList(postRepository.findPostsByUserId(currentUser.getId()));
+        }
+        final List<PostStatus> statusEnumList =
+                Arrays.stream(statusList.split(",")).map(this::convertToEnum).toList();
+        final List<Post> posts = postRepository.findPostsByStatus(currentUser.getId(), statusEnumList);
+        final List<String> pickupLocationIds =
+                posts.stream().map(Post::getPickupLocationId).toList();
+        final List<String> dropLocationIds =
+                posts.stream().map(Post::getDropLocationId).toList();
+        final List<String> postIds = posts.stream().map(Post::getId).toList();
+        final List<DeliveryLocationResponse> pickupLocationResponses =
+                locationClient.findByIdList(pickupLocationIds).getResult();
+        final List<DeliveryLocationResponse> dropLocationResponses =
+                locationClient.findByIdList(dropLocationIds).getResult();
+        final List<Payment> payments = paymentClient.findByPostIds(postIds).getResult();
+        return posts.stream()
+                .map(p -> {
+                    final PostResponse postResponse = postMapper.toPostResponse(p);
+                    postResponse.setPickupLocation(pickupLocationResponses.stream()
+                            .filter(pD -> pD.getId().equals(p.getPickupLocationId()))
+                            .findFirst()
+                            .get());
+                    postResponse.setDropLocation(dropLocationResponses.stream()
+                            .filter(pD -> pD.getId().equals(p.getDropLocationId()))
+                            .findFirst()
+                            .get());
+                    postResponse.setPayment(payments.stream()
+                            .filter(pM -> pM.getPostId().equals(p.getId()))
+                            .findFirst()
+                            .get());
+                    return postResponse;
+                })
+                .toList();
+    }
 
     private PostStatus convertToEnum(final String status) {
         try {

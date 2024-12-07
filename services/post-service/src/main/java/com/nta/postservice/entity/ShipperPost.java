@@ -24,7 +24,7 @@ public class ShipperPost {
 
     @Id
     @ManyToOne
-    @JoinColumn(name = "post_id",nullable = false)
+    @JoinColumn(name = "post_id", nullable = false)
     Post post;
 
     @Enumerated(EnumType.STRING)

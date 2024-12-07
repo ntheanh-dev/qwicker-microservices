@@ -1,24 +1,22 @@
 package com.nta.profileservice.service;
 
-import com.nta.profileservice.model.AuthenticatedUserDetail;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import com.nta.profileservice.dto.request.UploadImageRequest;
 import com.nta.profileservice.dto.request.UserProfileCreationRequest;
-import com.nta.profileservice.dto.response.UploadImageResponse;
 import com.nta.profileservice.dto.response.UserProfileResponse;
 import com.nta.profileservice.entity.Profile;
 import com.nta.profileservice.enums.ErrorCode;
 import com.nta.profileservice.enums.ProfileType;
 import com.nta.profileservice.exception.AppException;
 import com.nta.profileservice.mapper.ProfileMapper;
+import com.nta.profileservice.model.AuthenticatedUserDetail;
 import com.nta.profileservice.repository.ProfileRepository;
 import com.nta.profileservice.repository.httpClient.FileClient;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
@@ -29,14 +27,15 @@ public class UserProfileService {
     ProfileMapper profileMapper;
     FileClient fileClient;
     AuthenticationService authenticationService;
+
     public UserProfileResponse createUserProfile(final UserProfileCreationRequest request) {
         Profile userProfile = profileMapper.toUserProfile(request);
         // Call file-service to upload avatar
-//        final UploadImageResponse uploadImageResponse = fileClient.uploadImage(UploadImageRequest.builder()
-//                .isMultiple(false)
-//                .base64(request.getAvatarBase64())
-//                .build());
-//        userProfile.setAvatar(uploadImageResponse.getUrl());
+        //        final UploadImageResponse uploadImageResponse = fileClient.uploadImage(UploadImageRequest.builder()
+        //                .isMultiple(false)
+        //                .base64(request.getAvatarBase64())
+        //                .build());
+        //        userProfile.setAvatar(uploadImageResponse.getUrl());
         userProfile = profileRepository.save(userProfile);
         return profileMapper.toUserProfileResponse(userProfile);
     }

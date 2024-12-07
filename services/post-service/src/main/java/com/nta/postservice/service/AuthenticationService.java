@@ -1,14 +1,14 @@
-package com.nta.profileservice.service;
+package com.nta.postservice.service;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
-import com.nta.profileservice.model.AuthenticatedUserDetail;
+import com.nta.postservice.model.AuthenticatedUserDetail;
 
 @Service
 public class AuthenticationService {
-    public AuthenticatedUserDetail getAuthenticatedUserDetailFromToken() {
+    public AuthenticatedUserDetail getUserDetail() {
         final Jwt jwt =
                 (Jwt) SecurityContextHolder.getContext().getAuthentication().getCredentials();
         final String subject = jwt.getSubject();

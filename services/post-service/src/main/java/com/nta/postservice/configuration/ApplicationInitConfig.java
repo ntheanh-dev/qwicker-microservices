@@ -31,19 +31,26 @@ public class ApplicationInitConfig {
         return args -> {
             if (productCategoryRepository.count() == 0) {
                 log.info("Initializing product category");
-                productCategoryRepository.save(
-                        ProductCategory.builder().name("Thực phẩm & đồ uống").build());
-                productCategoryRepository.save(
-                        ProductCategory.builder().name("Văn phòng phẩm").build());
-                productCategoryRepository.save(
-                        ProductCategory.builder().name("Quần áo & Phụ kiện").build());
-                productCategoryRepository.save(
-                        ProductCategory.builder().name("Đồ điện tử").build());
                 productCategoryRepository.save(ProductCategory.builder()
-                        .name("Nguyên liệu / Linh kiện")
+                        .id("1")
+                        .name("Thực phẩm & đồ uống")
                         .build());
                 productCategoryRepository.save(
-                        ProductCategory.builder().name("Đồ gia dụng / Nội thất").build());
+                        ProductCategory.builder().id("2").name("Văn phòng phẩm").build());
+                productCategoryRepository.save(ProductCategory.builder()
+                        .id("3")
+                        .name("Quần áo & Phụ kiện")
+                        .build());
+                productCategoryRepository.save(
+                        ProductCategory.builder().id("4").name("Đồ điện tử").build());
+                productCategoryRepository.save(ProductCategory.builder()
+                        .id("5")
+                        .name("Nguyên liệu / Linh kiện")
+                        .build());
+                productCategoryRepository.save(ProductCategory.builder()
+                        .id("6")
+                        .name("Đồ gia dụng / Nội thất")
+                        .build());
             }
             if (vehicleRepository.count() == 0) {
                 log.info("Initializing vehicle type");
