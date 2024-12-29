@@ -7,9 +7,9 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import com.nta.postservice.configuration.AuthenticationRequestInterceptor;
-import com.nta.postservice.dto.request.LocationCreationRequest;
+import com.nta.postservice.dto.request.internal.LocationCreationRequest;
 import com.nta.postservice.dto.response.ApiResponse;
-import com.nta.postservice.dto.response.DeliveryLocationResponse;
+import com.nta.postservice.dto.response.internal.DeliveryLocationResponse;
 
 @FeignClient(
         name = "location-service",

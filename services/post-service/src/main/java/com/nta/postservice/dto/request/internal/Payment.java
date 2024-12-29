@@ -1,4 +1,6 @@
-package com.nta.postservice.dto.request;
+package com.nta.postservice.dto.request.internal;
+
+import java.math.BigDecimal;
 
 import com.nta.postservice.enums.PaymentMethod;
 
@@ -10,7 +12,9 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class PaymentCreationRequest {
+public class Payment {
+    BigDecimal price;
     boolean isPosterPay;
-    PaymentMethod method;
+    String postId;
+    PaymentMethod paymentMethod;
 }

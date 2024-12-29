@@ -4,10 +4,23 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: websocket-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+  data:
+    redis:
+      host: "${redis:localhost}"
+      port: 6380
 
 application:
   config:
     identity-url: http://localhost:8082/identity
+    post-url: http://localhost:8085/post
+    profile-url: http://localhost:8081/profile
     jwt:
       signerKey: "akdXchw5FloESb63Kc+DFhTARvpkowiUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij"
 

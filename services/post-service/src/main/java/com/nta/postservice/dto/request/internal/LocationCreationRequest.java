@@ -1,4 +1,4 @@
-package com.nta.postservice.dto.response;
+package com.nta.postservice.dto.request.internal;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -8,8 +8,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class DeliveryLocationResponse {
-    String id;
+public class LocationCreationRequest {
     String contact;
     String phoneNumber;
     String addressLine;

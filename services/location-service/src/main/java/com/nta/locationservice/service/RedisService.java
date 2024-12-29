@@ -1,10 +1,12 @@
 package com.nta.locationservice.service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -12,10 +14,12 @@ import org.springframework.stereotype.Service;
 public class RedisService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final HashOperations<String, String, Object> hashOperations;
+    private final ListOperations<String, Object> listOperations;
 
     public RedisService(RedisTemplate<String, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
         this.hashOperations = redisTemplate.opsForHash();
+        this.listOperations = redisTemplate.opsForList();
     }
 
     public boolean isRedisLive() {
@@ -79,5 +83,30 @@ public class RedisService {
             return value.equals(currentValue);
         }
         return false;
+    }
+
+    public void addToList(String key, Object value) {
+        listOperations.rightPush(key, value);
+    }
+
+    public List<Object> getAllFromList(String key) {
+        return listOperations.range(key, 0, -1);
+    }
+
+    public void deleteList(String key) {
+        redisTemplate.delete(key);
+    }
+
+    public boolean containsElement(String key, Object value) {
+        List<Object> list = listOperations.range(key, 0, -1);
+        return list != null && list.contains(value);
+    }
+
+    public Long getListSize(String key) {
+        return listOperations.size(key);
+    }
+
+    public void removeFromList(String key, Object value) {
+        listOperations.remove(key, 1, value);
     }
 }

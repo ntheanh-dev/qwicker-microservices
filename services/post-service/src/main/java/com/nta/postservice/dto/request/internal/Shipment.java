@@ -1,4 +1,4 @@
-package com.nta.postservice.dto.request;
+package com.nta.postservice.dto.request.internal;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

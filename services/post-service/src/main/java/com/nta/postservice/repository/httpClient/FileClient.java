@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.nta.postservice.configuration.AuthenticationRequestInterceptor;
-import com.nta.postservice.dto.request.UploadImageRequest;
+import com.nta.postservice.dto.request.internal.UploadImageRequest;
 import com.nta.postservice.dto.response.ApiResponse;
-import com.nta.postservice.dto.response.UploadImageResponse;
+import com.nta.postservice.dto.response.internal.UploadImageResponse;
 
 @FeignClient(
         name = "file-service",

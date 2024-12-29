@@ -75,4 +75,18 @@ public class ShipperProfileService {
                 .map(shipperProfileMapper::toShipperProfileResponse)
                 .toList();
     }
+
+    public ShipperProfileResponse getShipperProfileById(final String id) {
+        final Profile profile = userProfileService.findByAccountId(id);
+        final ShipperProfile shipperProfile = shipperProfileRepository
+                .findByProfileId(profile.getId())
+                .orElseThrow(() -> new AppException(ErrorCode.PROFILE_NOT_FOUND));
+
+        final ShipperProfileResponse shipperProfileResponse =
+                shipperProfileMapper.toShipperProfileResponse(shipperProfile);
+        shipperProfileResponse.setProfile(profileMapper.toUserProfileResponse(profile));
+        shipperProfileResponse.setAccountId(id);
+        //TODO Call post-service to get ratings
+        return shipperProfileResponse;
+    }
 }

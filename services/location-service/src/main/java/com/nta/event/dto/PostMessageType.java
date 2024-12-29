@@ -1,6 +1,6 @@
-package com.nta.websocket.enums;
+package com.nta.event.dto;
 
-public enum WsMessageType {
+public enum PostMessageType {
     REQUEST_DELIVERY,
     SHIPPER_LOCATION,
     UPDATE_POST_STATUS,

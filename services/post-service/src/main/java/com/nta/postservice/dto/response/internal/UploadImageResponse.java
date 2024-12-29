@@ -1,4 +1,4 @@
-package com.nta.postservice.dto.request;
+package com.nta.postservice.dto.response.internal;
 
 import java.util.List;
 
@@ -12,12 +12,11 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UploadImageRequest {
-
+public class UploadImageResponse {
     @NotNull
     private Boolean isMultiple;
 
-    String base64;
+    String url;
 
-    private List<String> base64List;
+    private List<String> urls;
 }

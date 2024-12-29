@@ -1,7 +1,10 @@
 package com.nta.profileservice.dto.response;
 
+import com.nta.profileservice.dto.response.internal.RatingResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -15,4 +18,5 @@ public class ShipperProfileResponse {
     String vehicleId;
     String identityF;
     String identityB;
+    Set<RatingResponse> ratings;
 }

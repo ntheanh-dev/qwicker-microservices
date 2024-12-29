@@ -3,7 +3,8 @@ package com.nta.postservice.dto.response;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-import com.nta.postservice.dto.request.Payment;
+import com.nta.postservice.dto.request.internal.Payment;
+import com.nta.postservice.dto.response.internal.DeliveryLocationResponse;
 import com.nta.postservice.entity.PostHistory;
 import com.nta.postservice.entity.Product;
 import com.nta.postservice.entity.Vehicle;

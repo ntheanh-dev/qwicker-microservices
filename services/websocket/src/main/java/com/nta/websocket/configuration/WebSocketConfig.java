@@ -1,7 +1,7 @@
 package com.nta.websocket.configuration;
 
-import com.nta.websocket.component.CustomJwtDecoder;
-import lombok.experimental.NonFinal;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -22,10 +22,10 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
+import com.nta.websocket.component.CustomJwtDecoder;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.List;
 
 @Configuration
 @EnableWebSocketMessageBroker
@@ -33,8 +33,6 @@ import java.util.List;
 @Order(Ordered.HIGHEST_PRECEDENCE + 99)
 @Slf4j
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
-    @Value("${application.config.jwt.signerKey}")
-    protected String SIGNER_KEY;
     private final CustomJwtDecoder customJwtDecoder;
 
     @Override
@@ -45,9 +43,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(final StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws")
-                .setAllowedOriginPatterns("*")
-                .withSockJS();
+        registry.addEndpoint("/ws").setAllowedOriginPatterns("*").withSockJS();
     }
 
     @Override
@@ -55,8 +51,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registration.interceptors(new ChannelInterceptor() {
             @Override
             public Message<?> preSend(Message<?> message, MessageChannel channel) {
-                StompHeaderAccessor accessor =
-                        MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+                StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
                 assert accessor != null;
                 if (StompCommand.CONNECT.equals(accessor.getCommand())) {
                     try {
@@ -70,7 +65,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                             return null;
                         }
                         final String username = jwt.getSubject();
-                        //TODO get authorities from token
+                        // TODO get authorities from token
                         List<GrantedAuthority> authorities = List.of();
                         final UsernamePasswordAuthenticationToken authentication =
                                 new UsernamePasswordAuthenticationToken(username, null, authorities);
@@ -87,5 +82,4 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             }
         });
     }
-
 }

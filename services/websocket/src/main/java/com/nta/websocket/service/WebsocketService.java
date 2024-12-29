@@ -3,6 +3,7 @@ package com.nta.websocket.service;
 import java.security.Principal;
 import java.util.*;
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
@@ -22,28 +23,26 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class WebsocketService {
-    @NonFinal
-    Set<String> onlineAccounts;
-
-    @NonFinal
-    Map<String, Set<String>> accountSubscribed;
-
+    Set<String> onlineAccounts = new HashSet<>();
+    Map<String, Set<String>> accountSubscribed = new HashMap<>();
+    String ONLINE_SHIPPER_KEY = "ONLINE_SHIPPER";
     IdentityClient identityClient;
-
+    RedisService redisService;
     public void addOnlineAccount(Principal user) {
         if (user == null) return;
-        var userDetails = getUserDetailFromToken(user);
+        final var userDetails = getUserDetailFromToken(user);
         log.info("{} is online", userDetails.getUsername());
-        onlineAccounts.add(userDetails.getId());
+        onlineAccounts.add(userDetails.getUsername());
+        redisService.addToList(ONLINE_SHIPPER_KEY, userDetails.getId());
     }
 
     public void removeOnlineAccount(Principal user) {
-        if (user != null) {
-            var userDetails = getUserDetailFromToken(user);
-            log.info("{} went offline", userDetails.getUsername());
-            onlineAccounts.remove(userDetails.getId());
-            accountSubscribed.remove(userDetails.getId());
-        }
+        if(user == null) return;
+        var userDetails = getUserDetailFromToken(user);
+        log.info("{} went offline", userDetails.getUsername());
+        onlineAccounts.remove(userDetails.getId());
+        accountSubscribed.remove(userDetails.getId());
+        redisService.removeFromList(ONLINE_SHIPPER_KEY, userDetails.getId());
     }
 
     public boolean isAccountOnline(String userId) {
@@ -80,10 +79,7 @@ public class WebsocketService {
     }
 
     public AuthenticatedAccountDetail getUserDetailFromToken(final Principal principal) {
-        final JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) principal;
-        final Jwt jwt = (Jwt) jwtAuthenticationToken.getCredentials();
-        final String subject = jwt.getSubject();
-        final String userId = jwt.getClaim("user_id");
-        return AuthenticatedAccountDetail.builder().id(userId).username(subject).build();
+        final String userId = (String) ((UsernamePasswordAuthenticationToken) principal).getDetails();
+        return AuthenticatedAccountDetail.builder().id(userId).username(principal.getName()).build();
     }
 }

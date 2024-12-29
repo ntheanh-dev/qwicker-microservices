@@ -11,6 +11,9 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   kafka:
     bootstrap-servers: "${kafka:localhost}:9094"
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     consumer:
       group-id: websocket-group
       auto-offset-reset: latest
@@ -22,7 +25,9 @@ spring:
     redis:
       host: "${redis:localhost}"
       port: 6380
-
+application:
+  config:
+    post-url: http://localhost:8085/post
 server:
   port: 8086
   servlet:

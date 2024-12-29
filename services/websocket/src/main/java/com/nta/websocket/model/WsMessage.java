@@ -1,17 +1,18 @@
 package com.nta.websocket.model;
 
-import com.nta.websocket.enums.WsMessageType;
+import com.nta.event.dto.PostMessageType;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class Message {
-    private WsMessageType messageType;
+@SuperBuilder
+public class WsMessage {
+    private PostMessageType messageType;
     private String content;
 }

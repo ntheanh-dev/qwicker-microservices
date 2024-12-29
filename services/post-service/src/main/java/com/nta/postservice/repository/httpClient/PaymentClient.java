@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.nta.postservice.configuration.AuthenticationRequestInterceptor;
-import com.nta.postservice.dto.request.Payment;
+import com.nta.postservice.dto.request.internal.Payment;
 import com.nta.postservice.dto.response.ApiResponse;
 
 @FeignClient(
@@ -19,7 +19,7 @@ import com.nta.postservice.dto.response.ApiResponse;
         configuration = {AuthenticationRequestInterceptor.class})
 public interface PaymentClient {
     @PostMapping(value = "/internal/payments", produces = MediaType.APPLICATION_JSON_VALUE)
-    Object createPayment(@RequestBody Payment payment);
+    ApiResponse<Payment> createPayment(@RequestBody Payment payment);
 
     @GetMapping(value = "/internal/payments", produces = MediaType.APPLICATION_JSON_VALUE)
     ApiResponse<Payment> findByPostId(@RequestParam String postId);

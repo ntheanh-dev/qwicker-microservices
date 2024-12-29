@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Entity
+@IdClass(ShipperPostId.class)
 @Table(name = "shipper_post")
 public class ShipperPost {
     @Id

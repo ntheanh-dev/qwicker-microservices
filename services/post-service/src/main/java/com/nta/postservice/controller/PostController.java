@@ -3,6 +3,7 @@ package com.nta.postservice.controller;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.web.bind.annotation.*;
 
 import com.nta.postservice.dto.request.PostCreationRequest;
@@ -24,7 +25,7 @@ public class PostController {
     PostService postService;
 
     @PostMapping
-    ApiResponse<Post> createPost(@RequestBody PostCreationRequest request) {
+    ApiResponse<Post> createPost(@RequestBody PostCreationRequest request) throws JsonProcessingException {
         var response = postService.createPost(request);
         return ApiResponse.<Post>builder().result(response).build();
     }

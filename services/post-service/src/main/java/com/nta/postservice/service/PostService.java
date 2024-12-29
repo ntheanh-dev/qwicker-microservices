@@ -6,16 +6,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nta.event.dto.FindNearestShipperEvent;
+import com.nta.postservice.entity.ShipperPost;
+import com.nta.postservice.enums.ShipperPostStatus;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.nta.postservice.dto.request.Payment;
+import com.nta.postservice.dto.request.internal.Payment;
 import com.nta.postservice.dto.request.PostCreationRequest;
-import com.nta.postservice.dto.request.UploadImageRequest;
-import com.nta.postservice.dto.response.DeliveryLocationResponse;
+import com.nta.postservice.dto.request.internal.UploadImageRequest;
+import com.nta.postservice.dto.response.internal.DeliveryLocationResponse;
 import com.nta.postservice.dto.response.PostResponse;
-import com.nta.postservice.dto.response.UploadImageResponse;
+import com.nta.postservice.dto.response.internal.UploadImageResponse;
 import com.nta.postservice.entity.Post;
 import com.nta.postservice.entity.PostHistory;
 import com.nta.postservice.entity.Product;
@@ -51,9 +57,11 @@ public class PostService {
     VehicleRepository vehicleRepository;
     PostMapper postMapper;
     AuthenticationService authenticationService;
-
+    KafkaTemplate<String, Object> kafkaTemplate;
+    ObjectMapper objectMapper;
+    ShipperPostRepository shipperPostRepository;
     @Transactional
-    public Post createPost(final PostCreationRequest request) {
+    public Post createPost(final PostCreationRequest request) throws JsonProcessingException {
         // --------------Product-----------------
         log.info("Call file-service to upload product image");
         final Product prod = productMapper.toProduct(request.getProduct());
@@ -70,22 +78,19 @@ public class PostService {
         //            throw new AppException(ErrorCode.CANNOT_UPLOAD_IMAGE);
         //        });
         // --------------Location-----------------
-        final String pickupLocationId = locationClient
+        final DeliveryLocationResponse pickupLocation = locationClient
                 .createDeliveryLocation(request.getShipment().getPickupLocation())
-                .getResult()
-                .getId();
-        final String dropLocationId = locationClient
+                .getResult();
+        final DeliveryLocationResponse dropLocation = locationClient
                 .createDeliveryLocation(request.getShipment().getDropLocation())
-                .getResult()
-                .getId();
-        // TODO Call payment server to persist payment data
+                .getResult();
         log.info(authenticationService.getUserDetail().getId());
         // ---------------Post----------------------
         final Post post = postRepository.save(Post.builder()
                 .userId(authenticationService.getUserDetail().getId())
                 .description(request.getOrder().getDescription())
-                .dropLocationId(dropLocationId)
-                .pickupLocationId(pickupLocationId)
+                .dropLocationId(dropLocation.getId())
+                .pickupLocationId(pickupLocation.getId())
                 .product(savedProd)
                 .deliveryTimeType(request.getShipment().getDeliveryTimeType())
                 .vehicleType(vehicleRepository
@@ -104,11 +109,24 @@ public class PostService {
                 .description("Post was created")
                 .build());
         // -----------------Payment-------------------
-        paymentClient.createPayment(Payment.builder()
+        final Payment payment = paymentClient.createPayment(Payment.builder()
                 .postId(post.getId())
                 .isPosterPay(request.getPayment().isPosterPay())
                 .price(request.getShipment().getCost())
                 .paymentMethod(request.getPayment().getMethod())
+                .build()).getResult();
+        // -----------------Push notification to shippers----------------------
+        final PostResponse postResponse = postMapper.toPostResponse(post);
+        postResponse.setPayment(payment);
+        postResponse.setPickupLocation(pickupLocation);
+        postResponse.setDropLocation(dropLocation);
+        kafkaTemplate.send("find-nearest-shipper", FindNearestShipperEvent.builder()
+                .postId(post.getId())
+                .latitude(pickupLocation.getLatitude())
+                .longitude(pickupLocation.getLongitude())
+                .vehicleId(request.getOrder().getVehicleId())
+                .km(5)
+                .postResponse(objectMapper.writeValueAsString(postResponse))
                 .build());
         return post;
     }
@@ -185,5 +203,39 @@ public class PostService {
         } catch (IllegalArgumentException e) {
             throw new AppException(ErrorCode.INVALID_POST_STATUS);
         }
+    }
+
+    public void changeStatus(final String postId, final String status) {
+        final PostStatus postStatus = convertToEnum(status);
+        final Post post = postRepository.findById(postId).get();
+        post.setStatus(postStatus);
+        postRepository.save(post);
+    }
+
+    public PostStatus findPostStatusByPostId(final String postId) {
+        return postRepository.findPostStatusByPostId(postId);
+    }
+
+    public void shipperJoinPost(final String postId, final String shipperId) {
+        shipperPostRepository.save(
+                ShipperPost.builder()
+                        .shipper(shipperId)
+                        .joinedAt(LocalDateTime.now())
+                        .status(ShipperPostStatus.JOINED)
+                        .post(postRepository.findById(postId).get())
+                        .build()
+        );
+    }
+
+    Boolean isShipperJoinPost(final String postId, final String shipperId) {
+        return shipperPostRepository.existsByShipperAndPostId(shipperId, postId);
+    }
+
+    public Integer countShipperJoinByPostId(final String postId) {
+        return shipperPostRepository.countShipperJoinedByPostId(postId);
+    }
+
+    public List<String> findAllJoinedShipperIdsByPostId(final String postId) {
+        return shipperPostRepository.findAllJoinedShipperIdsByPostId(postId);
     }
 }
