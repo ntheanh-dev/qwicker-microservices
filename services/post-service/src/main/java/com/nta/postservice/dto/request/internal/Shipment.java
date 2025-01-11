@@ -17,10 +17,10 @@ import lombok.experimental.FieldDefaults;
 public class Shipment {
     BigDecimal cost;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-M-d H:m")
-    LocalDateTime pickupDatetime;
-
     DeliveryTimeType deliveryTimeType; // now or latter
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-M-d H:m")
+    LocalDateTime deliveryTimeRequest;
+
     LocationCreationRequest pickupLocation;
     LocationCreationRequest dropLocation;
 }

@@ -26,6 +26,7 @@ public class Post {
     String description;
     LocalDateTime postTime;
     DeliveryTimeType deliveryTimeType;
+    LocalDateTime deliveryTimeRequest;
 
     @Enumerated(EnumType.STRING)
     PostStatus status;

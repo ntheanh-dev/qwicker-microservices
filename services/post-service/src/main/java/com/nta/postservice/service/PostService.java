@@ -93,6 +93,7 @@ public class PostService {
                 .pickupLocationId(pickupLocation.getId())
                 .product(savedProd)
                 .deliveryTimeType(request.getShipment().getDeliveryTimeType())
+                .deliveryTimeRequest(request.getShipment().getDeliveryTimeRequest())
                 .vehicleType(vehicleRepository
                         .findById(request.getOrder().getVehicleId())
                         .orElseThrow(() -> new AppException(ErrorCode.VEHICLE_NOT_FOUND)))
