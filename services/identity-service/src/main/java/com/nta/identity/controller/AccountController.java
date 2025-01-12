@@ -12,6 +12,7 @@ import com.nta.identity.dto.response.AccountResponse;
 import com.nta.identity.dto.response.ApiResponse;
 import com.nta.identity.dto.response.DataExistResponse;
 import com.nta.identity.service.AccountService;
+import com.nta.identity.service.AuthenticationService;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AccountController {
     AccountService accountService;
+    AuthenticationService authenticationService;
 
     @PostMapping("/registration")
     ApiResponse<AccountResponse> createUser(@ModelAttribute @Valid AccountCreationRequest request) {

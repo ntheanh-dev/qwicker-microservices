@@ -30,4 +30,8 @@ public class Account {
 
     @ManyToMany
     Set<Role> roles;
+
+    @Column(length = 15, columnDefinition = "varchar(15) default 'OFFLINE'")
+    @Enumerated(EnumType.STRING)
+    AccountStatus status;
 }

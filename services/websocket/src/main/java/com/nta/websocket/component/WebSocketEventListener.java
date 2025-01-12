@@ -1,5 +1,9 @@
 package com.nta.websocket.component;
 
+import com.nta.websocket.dto.request.internal.ChangeAccountStatusRequest;
+import com.nta.websocket.enums.internal.AccountStatus;
+import com.nta.websocket.model.AuthenticatedAccountDetail;
+import com.nta.websocket.repository.httpClient.IdentityClient;
 import com.nta.websocket.service.RedisService;
 import com.nta.websocket.service.WebsocketService;
 import lombok.AccessLevel;
@@ -12,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,18 +25,26 @@ import java.util.Map;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class WebSocketEventListener {
-        WebsocketService onlineOfflineService;
-        RedisService redisService;
-        Map<String, String> simpSessionIdToSubscriptionId = new HashMap<>();
-        @EventListener
-        public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
-            onlineOfflineService.removeOnlineAccount(event.getUser());
-        }
+    WebsocketService onlineOfflineService;
+    IdentityClient identityClient;
 
-        @EventListener
-        public void handleConnectedEvent(SessionConnectedEvent sessionConnectedEvent) {
-            onlineOfflineService.addOnlineAccount(sessionConnectedEvent.getUser());
-        }
+    @EventListener
+    public void handleWebSocketDisconnectListener(final SessionDisconnectEvent event) {
+        final AuthenticatedAccountDetail userDetails = onlineOfflineService.getUserDetailFromWsSession(event);
+        identityClient.changeStatusById(userDetails.getId(), ChangeAccountStatusRequest.builder()
+                .status(AccountStatus.OFFLINE)
+                .build());
+        onlineOfflineService.removeOnlineAccount(userDetails);
+    }
+
+    @EventListener
+    public void handleConnectedEvent(final SessionConnectedEvent event) {
+        final AuthenticatedAccountDetail userDetails = onlineOfflineService.getUserDetailFromWsSession(event);
+        identityClient.changeStatusById(userDetails.getId(), ChangeAccountStatusRequest.builder()
+                .status(AccountStatus.ONLINE)
+                .build());
+        onlineOfflineService.addOnlineAccount(userDetails);
+    }
     //
     //    @EventListener
     //    @SendToUser

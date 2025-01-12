@@ -8,8 +8,10 @@ import java.util.StringJoiner;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -196,4 +198,10 @@ public class AuthenticationService {
     }
 
     private record TokenInfo(String token, Date expiryDate) {}
+
+    public String getAccountIdFromCurrentToken() {
+        final Jwt jwt =
+                (Jwt) SecurityContextHolder.getContext().getAuthentication().getCredentials();
+        return jwt.getClaim("userId");
+    }
 }

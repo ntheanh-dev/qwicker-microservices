@@ -4,8 +4,6 @@ import java.security.Principal;
 import java.util.*;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 import com.nta.websocket.dto.response.Account;
@@ -15,8 +13,8 @@ import com.nta.websocket.repository.httpClient.IdentityClient;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.socket.messaging.AbstractSubProtocolEvent;
 
 @Service
 @Slf4j
@@ -25,24 +23,17 @@ import lombok.extern.slf4j.Slf4j;
 public class WebsocketService {
     Set<String> onlineAccounts = new HashSet<>();
     Map<String, Set<String>> accountSubscribed = new HashMap<>();
-    String ONLINE_SHIPPER_KEY = "ONLINE_SHIPPER";
     IdentityClient identityClient;
-    RedisService redisService;
-    public void addOnlineAccount(Principal user) {
-        if (user == null) return;
-        final var userDetails = getUserDetailFromToken(user);
+
+    public void addOnlineAccount(final AuthenticatedAccountDetail userDetails) {
         log.info("{} is online", userDetails.getUsername());
         onlineAccounts.add(userDetails.getUsername());
-        redisService.addToList(ONLINE_SHIPPER_KEY, userDetails.getId());
     }
 
-    public void removeOnlineAccount(Principal user) {
-        if(user == null) return;
-        var userDetails = getUserDetailFromToken(user);
+    public void removeOnlineAccount(final AuthenticatedAccountDetail userDetails) {
         log.info("{} went offline", userDetails.getUsername());
         onlineAccounts.remove(userDetails.getId());
         accountSubscribed.remove(userDetails.getId());
-        redisService.removeFromList(ONLINE_SHIPPER_KEY, userDetails.getId());
     }
 
     public boolean isAccountOnline(String userId) {
@@ -81,5 +72,9 @@ public class WebsocketService {
     public AuthenticatedAccountDetail getUserDetailFromToken(final Principal principal) {
         final String userId = (String) ((UsernamePasswordAuthenticationToken) principal).getDetails();
         return AuthenticatedAccountDetail.builder().id(userId).username(principal.getName()).build();
+    }
+
+    public AuthenticatedAccountDetail getUserDetailFromWsSession(final AbstractSubProtocolEvent event) {
+        return getUserDetailFromToken(Objects.requireNonNull(event.getUser()));
     }
 }

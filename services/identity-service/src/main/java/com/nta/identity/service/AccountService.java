@@ -18,6 +18,7 @@ import com.nta.identity.dto.request.*;
 import com.nta.identity.dto.response.AccountResponse;
 import com.nta.identity.dto.response.DataExistResponse;
 import com.nta.identity.entity.Account;
+import com.nta.identity.entity.AccountStatus;
 import com.nta.identity.entity.Role;
 import com.nta.identity.enums.AccountType;
 import com.nta.identity.enums.ErrorCode;
@@ -53,6 +54,7 @@ public class AccountService {
 
         Account account = accountMapper.toAccount(request);
         account.setPassword(passwordEncoder.encode(request.getPassword()));
+        account.setStatus(AccountStatus.OFFLINE);
 
         final HashSet<Role> roles = new HashSet<>();
         if (request.getAccountType().equals(AccountType.SHIPPER)) {
@@ -170,5 +172,20 @@ public class AccountService {
 
     public List<Account> findAllById(final Set<String> ids) {
         return accountRepository.findAllById(ids);
+    }
+
+    public void changeStatusById(final String id, AccountStatus status) {
+        final Account account =
+                accountRepository.findById(id).orElseThrow(() -> new RuntimeException("Account not found"));
+        account.setStatus(status);
+        accountRepository.save(account);
+    }
+
+    public boolean isAccountOnline(final String accountId) {
+        return accountRepository
+                .findById(accountId)
+                .map(Account::getStatus)
+                .orElse(AccountStatus.OFFLINE)
+                .equals(AccountStatus.ONLINE);
     }
 }
