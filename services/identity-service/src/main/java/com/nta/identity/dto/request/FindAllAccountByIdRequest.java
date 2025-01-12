@@ -1,9 +1,9 @@
 package com.nta.identity.dto.request;
 
+import java.util.List;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.List;
 
 @Data
 @NoArgsConstructor

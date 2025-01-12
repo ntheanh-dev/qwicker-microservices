@@ -2,11 +2,15 @@ package com.nta.locationservice.service;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import com.nta.event.dto.DeliveryRequestEvent;
 import com.nta.event.dto.FindNearestShipperEvent;
 import com.nta.event.dto.PostMessageType;
+import com.nta.locationservice.dto.request.internal.ChangeAccountStatusRequest;
+import com.nta.locationservice.enums.internal.AccountStatus;
 import com.nta.locationservice.enums.internal.PostStatus;
+import com.nta.locationservice.repository.httpClient.IdentityClient;
 import com.nta.locationservice.repository.httpClient.PostClient;
 import org.springframework.data.geo.*;
 import org.springframework.data.redis.connection.RedisGeoCommands;
@@ -34,10 +38,11 @@ import lombok.extern.slf4j.Slf4j;
 public class GeoHashService {
     GeoOperations<String, String> geoOperations;
     RedisService redisService;
-    BingMapClientService bingMapClientService;
+    GoogMapClientService googMapClientService;
     static Integer GEOHASHING_PRECISION = 5;
     KafkaTemplate<String, Object> kafkaTemplate;
     PostClient postClient;
+    IdentityClient identityClient;
 
     public void startPost(final FindNearestShipperEvent message) {
         log.info("Received a post: {}", message.getPostId());
@@ -49,138 +54,148 @@ public class GeoHashService {
         final Map<String, Object> runningPosts = redisService.hashGetAll("RUNNING_POST");
         if (runningPosts.isEmpty()) return;
         runningPosts.forEach((key, value) -> {
-            // SELECTED SHIPPER
             final FindNearestShipperEvent post = (FindNearestShipperEvent) value;
+            final String postId = post.getPostId();
+            final double latitude = post.getLatitude();
+            final double longitude = post.getLongitude();
+
             final List<String> joinedShipper = postClient.findAllJoinedShipperIdsByPostId(post.getPostId()).getResult();
+
             if (joinedShipper.isEmpty()) {
-                getShippersDetailCacheByGeoHash(
-                        post.getLatitude(), post.getLongitude())
+                getAllShipperDetailCacheByGeoHash(
+                        latitude, longitude)
                         .keySet()
                         .forEach(
                                 shipperId -> {
-                                    if (!redisService.containsElement("RECEIVED_MESSAGE:" + key, shipperId)) {
+                                    final boolean isShipperOnline = identityClient.isAccountOnline(shipperId).getResult();
+                                    final boolean isShipperReceivedMessage = redisService.containsElement("RECEIVED_MESSAGE:" + postId, shipperId);
+                                    if (!isShipperReceivedMessage && !isShipperOnline) {
                                         try {
-                                            if(redisService.containsElement("ONLINE_SHIPPER", shipperId)) {
-                                                log.info("============== Pushing delivery request to shipper: {} ==============", shipperId);
-                                                kafkaTemplate.send("new-post", DeliveryRequestEvent.builder()
-                                                        .postId(key)
-                                                        .shipperId(shipperId)
-                                                        .postResponse(post.getPostResponse())
-                                                        .postMessageType(PostMessageType.DELIVERY_REQUEST)
-                                                        .build());
-                                                // Lưu lại những shipper da nhan msg
-                                                redisService.addToList("RECEIVED_MESSAGE:" + key, shipperId);
-                                            }
+                                            log.info("============== Pushing delivery request to shipper: {} ==============", shipperId);
+                                            kafkaTemplate.send("new-post", DeliveryRequestEvent.builder()
+                                                    .postId(key)
+                                                    .shipperId(shipperId)
+                                                    .postResponse(post.getPostResponse())
+                                                    .postMessageType(PostMessageType.DELIVERY_REQUEST)
+                                                    .build());
+                                            // Lưu lại những shipper da nhan msg
+                                            redisService.addToList(RedisKey.SHIPPER_RECEIVED_MSG + key, shipperId);
                                         } catch (Exception e) {
                                             log.error(e.getMessage());
                                         }
                                     }
                                 });
             } else {
-                selectShipperToShip(post, joinedShipper);
+                final String winShipper = findNearestShipper(joinedShipper, postId, latitude, longitude);
+
+                log.debug("============== Shipper {} was approval to take {} post ==============", winShipper, postId);
+                try {
+                    // notify figure out win shipper to user, and joined shippers
+                    kafkaTemplate.send("found-shipper", DeliveryRequestEvent.builder()
+                            .postId(postId)
+                            .shipperId(winShipper)
+                            .postResponse(post.getPostResponse())
+                            .postMessageType(PostMessageType.FOUND_SHIPPER)
+                            .build());
+                    // update postStatus
+                    postClient.changeStatus(postId, PostStatus.FOUND_SHIPPER.name());
+                    // update account status
+                    identityClient.changeStatusById(winShipper, ChangeAccountStatusRequest.builder()
+                            .status(AccountStatus.SHIPPING)
+                            .build());
+                } catch (Exception e) {
+                    log.error(e.getMessage());
+                }
+
+                // remove SHIPPER_RECEIVED_MSG on redis
+                redisService.deleteList(RedisKey.SHIPPER_RECEIVED_MSG + postId);
             }
         });
     }
 
-    public void selectShipperToShip(final FindNearestShipperEvent event, final List<String> joinedShipperIds) {
-        String appropriateShipperId;
+    /**
+     * Try to find nearest shipper to take this order
+     *
+     * @param joinedShipperIds shippers who want to take this order
+     * @return shipperId
+     */
+    public String findNearestShipper(final List<String> joinedShipperIds, final String postId, final double latitude, final double longitude) {
         if (joinedShipperIds.size() == 1) { // only one shipper joined
-            appropriateShipperId = joinedShipperIds.getFirst();
+            return joinedShipperIds.getFirst();
         } else { // find nearest shipper
             log.info("============== Found more than one shipper in this region, trying to find nearest shipper. ==============");
-            appropriateShipperId =
-                    findNearestShipperId(
-                            joinedShipperIds,
-                            event.getPostId(),
-                            event.getLatitude(),
-                            event.getLongitude(),
-                            999);
-        }
+            final Point myPoint = new Point(latitude, latitude);
+            final Circle within = new Circle(myPoint, new Distance(999, Metrics.KILOMETERS));
+            // Get all shipper points in redis and add them to GeoOperation
+            getAllShipperDetailCacheByGeoHash(latitude, longitude).values().forEach(s -> {
+                ShipperDetailCache shipperDetailCache = (ShipperDetailCache) s;
+                if (joinedShipperIds.contains(((ShipperDetailCache) s).getId())) {
+                    geoOperations.add(
+                            RedisKey.SHIPPER_LOCATION,
+                            new Point(shipperDetailCache.getLongitude(), shipperDetailCache.getLatitude()),
+                            postId);
+                }
+            });
 
-        log.debug("============== Shipper {} was approval to take {} post ==============", appropriateShipperId, event.getPostId());
-        try {
-            // notify found shipper to user, and joined shippers
-            kafkaTemplate.send("found-shipper", DeliveryRequestEvent.builder()
-                    .postId(event.getPostId())
-                    .shipperId(appropriateShipperId)
-                    .postResponse(event.getPostResponse())
-                    .postMessageType(PostMessageType.FOUND_SHIPPER)
-                    .build());
-            // update postStatus
-            postClient.changeStatus(event.getPostId(), PostStatus.FOUND_SHIPPER.name());
-        } catch (Exception e) {
-            log.error(e.getMessage());
+            // Query
+            RedisGeoCommands.GeoRadiusCommandArgs query = RedisGeoCommands.GeoRadiusCommandArgs.newGeoRadiusArgs()
+                    .includeCoordinates()
+                    .includeDistance()
+                    .sortAscending()
+                    .limit(5);
+            // Get shippers within radius
+            GeoResults<RedisGeoCommands.GeoLocation<String>> response =
+                    geoOperations.radius(RedisKey.SHIPPER_LOCATION, within, query);
+            if (response == null || response.getContent().isEmpty()) {
+                log.warn("Cannot find any shipper within {} km", 999);
+                throw new AppException(ErrorCode.CANNOT_FIND_SHIPPER_IN_REDIS);
+            }
+            // Convert to string
+            final List<String> nearLocations = response.getContent().stream()
+                    .map(geoLocation -> {
+                        final Point point = geoLocation.getContent().getPoint();
+                        return point.getX() + "," + point.getY();
+                    })
+                    .collect(Collectors.toList());
+
+            // Call external API to calculate duration
+            int nearestShipperIndexByDuration =
+                    googMapClientService.getNearestShipperIndex(latitude + "," + longitude, nearLocations);
+            return response.getContent()
+                    .get(nearestShipperIndexByDuration)
+                    .getContent()
+                    .getName();
         }
-        // remove SHIPPER_RECEIVED_MSG on redis
-        redisService.deleteList("RECEIVED_MESSAGE:" + event.getPostId());
     }
 
-    // Object o day la ShipperDetailCache and key is shipperId
-    public Map<String, Object> getShippersDetailCacheByGeoHash(final double latitude, final double longitude) {
+    /**
+     * <h3>Get all shipper objects stored in redis within a geo</h3>
+     *
+     * @param latitude
+     * @param longitude
+     * @return a map with key is id and object is ShipperDetailCache model
+     */
+    public Map<String, Object> getAllShipperDetailCacheByGeoHash(final double latitude, final double longitude) {
         final String geoHash = getGeohashing(latitude, longitude);
         final Map<String, Object> shippersInGeoHash = redisService.getField(geoHash);
         if (!shippersInGeoHash.isEmpty()) {
             return shippersInGeoHash;
+        } else {
+            final GeoHash geoHashObject = GeoHash.fromGeohashString(geoHash);
+            // Lấy các geohash lân cận
+            List<String> geoNeighbors = new ArrayList<>();
+            geoNeighbors.add(geoHash);  // Thêm geohash hiện tại vào danh sách các neighbors
+            geoNeighbors.addAll(Arrays.stream(geoHashObject.getAdjacent())
+                    .map(GeoHash::toBase32)  // Chuyển các geohash lân cận thành chuỗi Base32
+                    .toList());
+
+            // Lấy dữ liệu từ Redis cho tất cả các geohash trong danh sách neighbors
+            return geoNeighbors.stream()
+                    .map(redisService::getField)
+                    .filter(Objects::nonNull)  // Kiểm tra null trước khi xử lý
+                    .flatMap(m -> m.entrySet().stream())
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         }
-        // try to find shipper in larger space
-        final Map<String, Object> result = new HashMap<>();
-        log.info("============== Cannot find shipper in {}", geoHash + ", try to find in larger space ============== ");
-        findNeighbors(geoHash).forEach(neighBorHash -> {
-            log.info("============== Getting shippers in neighBorHash geohash: {} ==============", neighBorHash);
-            result.putAll(redisService.getField(neighBorHash));
-        });
-        return result;
-    }
-
-    private void initGeoOperationPoint(
-            final List<String> shipperIds, final String keyMember, final Double latitude, final Double longitude) {
-        getShippersDetailCacheByGeoHash(latitude, longitude).values().forEach(s -> {
-            ShipperDetailCache shipperDetailCache = (ShipperDetailCache) s;
-            if (shipperIds.contains(((ShipperDetailCache) s).getId())) {
-                geoOperations.add(
-                        RedisKey.SHIPPER_LOCATION,
-                        new Point(shipperDetailCache.getLongitude(), shipperDetailCache.getLatitude()),
-                        keyMember);
-            }
-        });
-    }
-
-    public String findNearestShipperId(
-            final List<String> shipperIds,
-            final String keyMember,
-            final Double latitude,
-            final Double longitude,
-            final int km) {
-        Point myPoint = new Point(longitude, latitude);
-        Circle within = new Circle(myPoint, new Distance(km, Metrics.KILOMETERS));
-        // Find shipper's location in redis
-        initGeoOperationPoint(shipperIds, keyMember, latitude, longitude);
-        //
-
-        // Query
-        RedisGeoCommands.GeoRadiusCommandArgs query = RedisGeoCommands.GeoRadiusCommandArgs.newGeoRadiusArgs()
-                .includeCoordinates()
-                .includeDistance()
-                .sortAscending()
-                .limit(4);
-        // Get shippers within radius
-        GeoResults<RedisGeoCommands.GeoLocation<String>> response =
-                geoOperations.radius(RedisKey.SHIPPER_LOCATION, within, query);
-        if (response == null || response.getContent().isEmpty()) {
-            log.warn("Cannot find any shipper within {} km", km);
-            throw new AppException(ErrorCode.CANNOT_FIND_SHIPPER_IN_REDIS);
-        }
-        List<Point> nearLocations = response.getContent().stream()
-                .map(m -> m.getContent().getPoint())
-                .toList();
-
-        // Call external API to calculate duration
-        int nearestShipperIndexByDuration =
-                bingMapClientService.getNearestShipperIndex(new Point(longitude, latitude), nearLocations);
-        return response.getContent()
-                .get(nearestShipperIndexByDuration)
-                .getContent()
-                .getName();
     }
 
     public String getGeohashing(final double latitude, final double longitude) {
@@ -188,27 +203,6 @@ public class GeoHashService {
         return geoHash.toBase32();
     }
 
-    public List<String> findNeighbors(final String geohashStr) {
-        // Tạo một đối tượng GeoHash từ chuỗi geohash
-        final GeoHash geoHash = GeoHash.fromGeohashString(geohashStr);
-        final List<String> result = new ArrayList<>();
-        // Lấy các geohash lân cận
-        Arrays.stream(geoHash.getAdjacent()).toList().forEach(g -> result.add(g.toBase32()));
-        return result;
-    }
-
-    public ShipperDetailCache getCurrentShipperLocation(final String shipperId) {
-        String currentGeoHash = redisService.getKey(shipperId);
-        final Map<String, Object> shippersInGeoHash =
-                redisService.getField(currentGeoHash); // string as shipper and object as shipperdetailcache
-        for (final Map.Entry<String, Object> entry : shippersInGeoHash.entrySet()) {
-            final String key = entry.getKey();
-            if (key.equals(shipperId)) {
-                return (ShipperDetailCache) entry.getValue();
-            }
-        }
-        return null;
-    }
 
     public void updateLocation(final UpdateLocationEvent updateLocationEvent) {
         final String newGeoHash = getGeohashing(updateLocationEvent.getLatitude(), updateLocationEvent.getLongitude());
@@ -236,5 +230,18 @@ public class GeoHashService {
         } else {
             log.warn("Redis server is offline, cannot update shipper location");
         }
+    }
+
+    public ShipperDetailCache getCurrentShipperLocation(final String shipperId) {
+        String currentGeoHash = redisService.getKey(shipperId);
+        final Map<String, Object> shippersInGeoHash =
+                redisService.getField(currentGeoHash); // string as shipper and object as shipperdetailcache
+        for (final Map.Entry<String, Object> entry : shippersInGeoHash.entrySet()) {
+            final String key = entry.getKey();
+            if (key.equals(shipperId)) {
+                return (ShipperDetailCache) entry.getValue();
+            }
+        }
+        return null;
     }
 }
