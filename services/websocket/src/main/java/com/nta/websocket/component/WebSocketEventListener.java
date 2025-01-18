@@ -1,24 +1,20 @@
 package com.nta.websocket.component;
 
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Component;
+import org.springframework.web.socket.messaging.SessionConnectedEvent;
+import org.springframework.web.socket.messaging.SessionDisconnectEvent;
+
 import com.nta.websocket.dto.request.internal.ChangeAccountStatusRequest;
 import com.nta.websocket.enums.internal.AccountStatus;
 import com.nta.websocket.model.AuthenticatedAccountDetail;
 import com.nta.websocket.repository.httpClient.IdentityClient;
-import com.nta.websocket.service.RedisService;
 import com.nta.websocket.service.WebsocketService;
+
 import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
-import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Component;
-
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.socket.messaging.SessionConnectedEvent;
-import org.springframework.web.socket.messaging.SessionDisconnectEvent;
-
-import java.security.Principal;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 @Slf4j
@@ -31,18 +27,22 @@ public class WebSocketEventListener {
     @EventListener
     public void handleWebSocketDisconnectListener(final SessionDisconnectEvent event) {
         final AuthenticatedAccountDetail userDetails = onlineOfflineService.getUserDetailFromWsSession(event);
-        identityClient.changeStatusById(userDetails.getId(), ChangeAccountStatusRequest.builder()
-                .status(AccountStatus.OFFLINE)
-                .build());
+        identityClient.changeStatusById(
+                userDetails.getId(),
+                ChangeAccountStatusRequest.builder()
+                        .status(AccountStatus.OFFLINE)
+                        .build());
         onlineOfflineService.removeOnlineAccount(userDetails);
     }
 
     @EventListener
     public void handleConnectedEvent(final SessionConnectedEvent event) {
         final AuthenticatedAccountDetail userDetails = onlineOfflineService.getUserDetailFromWsSession(event);
-        identityClient.changeStatusById(userDetails.getId(), ChangeAccountStatusRequest.builder()
-                .status(AccountStatus.ONLINE)
-                .build());
+        identityClient.changeStatusById(
+                userDetails.getId(),
+                ChangeAccountStatusRequest.builder()
+                        .status(AccountStatus.ONLINE)
+                        .build());
         onlineOfflineService.addOnlineAccount(userDetails);
     }
     //

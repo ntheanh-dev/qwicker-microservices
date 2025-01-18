@@ -18,6 +18,7 @@ public class Shipment {
     BigDecimal cost;
 
     DeliveryTimeType deliveryTimeType; // now or latter
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-M-d H:m")
     LocalDateTime deliveryTimeRequest;
 

@@ -5,6 +5,7 @@ import java.util.*;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
+import org.springframework.web.socket.messaging.AbstractSubProtocolEvent;
 
 import com.nta.websocket.dto.response.Account;
 import com.nta.websocket.model.AuthenticatedAccountDetail;
@@ -14,7 +15,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.socket.messaging.AbstractSubProtocolEvent;
 
 @Service
 @Slf4j
@@ -71,7 +71,10 @@ public class WebsocketService {
 
     public AuthenticatedAccountDetail getUserDetailFromToken(final Principal principal) {
         final String userId = (String) ((UsernamePasswordAuthenticationToken) principal).getDetails();
-        return AuthenticatedAccountDetail.builder().id(userId).username(principal.getName()).build();
+        return AuthenticatedAccountDetail.builder()
+                .id(userId)
+                .username(principal.getName())
+                .build();
     }
 
     public AuthenticatedAccountDetail getUserDetailFromWsSession(final AbstractSubProtocolEvent event) {

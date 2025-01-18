@@ -6,28 +6,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nta.event.dto.FindNearestShipperEvent;
-import com.nta.postservice.entity.ShipperPost;
-import com.nta.postservice.enums.ShipperPostStatus;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.nta.postservice.dto.request.internal.Payment;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nta.event.dto.FindNearestShipperEvent;
 import com.nta.postservice.dto.request.PostCreationRequest;
+import com.nta.postservice.dto.request.internal.Payment;
 import com.nta.postservice.dto.request.internal.UploadImageRequest;
-import com.nta.postservice.dto.response.internal.DeliveryLocationResponse;
 import com.nta.postservice.dto.response.PostResponse;
+import com.nta.postservice.dto.response.internal.DeliveryLocationResponse;
 import com.nta.postservice.dto.response.internal.UploadImageResponse;
 import com.nta.postservice.entity.Post;
 import com.nta.postservice.entity.PostHistory;
 import com.nta.postservice.entity.Product;
+import com.nta.postservice.entity.ShipperPost;
 import com.nta.postservice.enums.ErrorCode;
 import com.nta.postservice.enums.PaymentMethod;
 import com.nta.postservice.enums.PostStatus;
+import com.nta.postservice.enums.ShipperPostStatus;
 import com.nta.postservice.exception.AppException;
 import com.nta.postservice.mapper.PostMapper;
 import com.nta.postservice.mapper.ProductMapper;
@@ -60,6 +60,7 @@ public class PostService {
     KafkaTemplate<String, Object> kafkaTemplate;
     ObjectMapper objectMapper;
     ShipperPostRepository shipperPostRepository;
+
     @Transactional
     public Post createPost(final PostCreationRequest request) throws JsonProcessingException {
         // --------------Product-----------------
@@ -110,25 +111,29 @@ public class PostService {
                 .description("Post was created")
                 .build());
         // -----------------Payment-------------------
-        final Payment payment = paymentClient.createPayment(Payment.builder()
-                .postId(post.getId())
-                .isPosterPay(request.getPayment().isPosterPay())
-                .price(request.getShipment().getCost())
-                .paymentMethod(request.getPayment().getMethod())
-                .build()).getResult();
+        final Payment payment = paymentClient
+                .createPayment(Payment.builder()
+                        .postId(post.getId())
+                        .isPosterPay(request.getPayment().isPosterPay())
+                        .price(request.getShipment().getCost())
+                        .paymentMethod(request.getPayment().getMethod())
+                        .build())
+                .getResult();
         // -----------------Push notification to shippers----------------------
         final PostResponse postResponse = postMapper.toPostResponse(post);
         postResponse.setPayment(payment);
         postResponse.setPickupLocation(pickupLocation);
         postResponse.setDropLocation(dropLocation);
-        kafkaTemplate.send("find-nearest-shipper", FindNearestShipperEvent.builder()
-                .postId(post.getId())
-                .latitude(pickupLocation.getLatitude())
-                .longitude(pickupLocation.getLongitude())
-                .vehicleId(request.getOrder().getVehicleId())
-                .km(5)
-                .postResponse(objectMapper.writeValueAsString(postResponse))
-                .build());
+        kafkaTemplate.send(
+                "find-nearest-shipper",
+                FindNearestShipperEvent.builder()
+                        .postId(post.getId())
+                        .latitude(pickupLocation.getLatitude())
+                        .longitude(pickupLocation.getLongitude())
+                        .vehicleId(request.getOrder().getVehicleId())
+                        .km(5)
+                        .postResponse(objectMapper.writeValueAsString(postResponse))
+                        .build());
         return post;
     }
 
@@ -218,14 +223,12 @@ public class PostService {
     }
 
     public void shipperJoinPost(final String postId, final String shipperId) {
-        shipperPostRepository.save(
-                ShipperPost.builder()
-                        .shipper(shipperId)
-                        .joinedAt(LocalDateTime.now())
-                        .status(ShipperPostStatus.JOINED)
-                        .post(postRepository.findById(postId).get())
-                        .build()
-        );
+        shipperPostRepository.save(ShipperPost.builder()
+                .shipper(shipperId)
+                .joinedAt(LocalDateTime.now())
+                .status(ShipperPostStatus.JOINED)
+                .post(postRepository.findById(postId).get())
+                .build());
     }
 
     Boolean isShipperJoinPost(final String postId, final String shipperId) {

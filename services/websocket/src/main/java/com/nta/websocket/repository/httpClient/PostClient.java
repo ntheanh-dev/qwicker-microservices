@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import com.nta.websocket.dto.response.ApiResponse;
 import com.nta.websocket.model.internal.PostStatus;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @FeignClient(name = "post-service", url = "${application.config.post-url}")
 public interface PostClient {
@@ -29,5 +28,4 @@ public interface PostClient {
 
     @GetMapping("/{id}/find-shipper-join")
     ApiResponse<List<String>> findAllJoinedShipperIdsByPostId(@PathVariable(name = "id") String postId);
-
 }

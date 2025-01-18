@@ -3,9 +3,6 @@ package com.nta.websocket.controller;
 import java.io.IOException;
 import java.security.Principal;
 
-import com.nta.websocket.dto.response.internal.ShipperProfileResponse;
-import com.nta.websocket.model.FoundShipperMessage;
-import com.nta.websocket.repository.httpClient.ProfileClient;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -19,9 +16,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nta.event.dto.DeliveryRequestEvent;
 import com.nta.event.dto.PostMessageType;
 import com.nta.event.dto.UpdateLocationEvent;
+import com.nta.websocket.dto.response.internal.ShipperProfileResponse;
+import com.nta.websocket.model.FoundShipperMessage;
 import com.nta.websocket.model.WsMessage;
 import com.nta.websocket.model.internal.PostStatus;
 import com.nta.websocket.repository.httpClient.PostClient;
+import com.nta.websocket.repository.httpClient.ProfileClient;
 import com.nta.websocket.service.AuthenticationService;
 
 import lombok.AccessLevel;
@@ -65,8 +65,11 @@ public class WsController {
 
     @KafkaListener(topics = "found-shipper")
     public void foundAppropriateShipperToTakeOrder(final DeliveryRequestEvent message) throws IOException {
-        final ShipperProfileResponse shipper = profileClient.getShipperProfileByAccountId(message.getShipperId()).getResult();
-        simpMessageSendingOperations.convertAndSend("/topic/post/" + message.getPostId(),
+        final ShipperProfileResponse shipper = profileClient
+                .getShipperProfileByAccountId(message.getShipperId())
+                .getResult();
+        simpMessageSendingOperations.convertAndSend(
+                "/topic/post/" + message.getPostId(),
                 FoundShipperMessage.builder()
                         .postResponse(message.getPostResponse())
                         .shipperResponse(objectMapper.writeValueAsString(shipper))

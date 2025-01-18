@@ -86,7 +86,7 @@ public class ShipperProfileService {
                 shipperProfileMapper.toShipperProfileResponse(shipperProfile);
         shipperProfileResponse.setProfile(profileMapper.toUserProfileResponse(profile));
         shipperProfileResponse.setAccountId(id);
-        //TODO Call post-service to get ratings
+        // TODO Call post-service to get ratings
         return shipperProfileResponse;
     }
 }

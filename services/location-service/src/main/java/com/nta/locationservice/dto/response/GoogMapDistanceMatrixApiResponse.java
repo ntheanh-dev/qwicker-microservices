@@ -1,9 +1,9 @@
 package com.nta.locationservice.dto.response;
 
+import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
 
 @Setter
 @Getter
@@ -27,7 +27,6 @@ public class GoogMapDistanceMatrixApiResponse {
             public static class Distance {
                 private String text;
                 private int value;
-
             }
 
             @Setter

@@ -1,9 +1,9 @@
 package com.nta.websocket.dto.response.internal;
 
+import java.time.LocalDateTime;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Setter

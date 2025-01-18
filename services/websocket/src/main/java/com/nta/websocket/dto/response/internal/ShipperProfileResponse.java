@@ -1,9 +1,9 @@
 package com.nta.websocket.dto.response.internal;
 
+import java.util.Set;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.Set;
 
 @Data
 @AllArgsConstructor

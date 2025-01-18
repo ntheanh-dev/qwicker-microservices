@@ -1,10 +1,11 @@
 package com.nta.profileservice.dto.response.internal;
 
+import java.time.LocalDateTime;
+
 import com.nta.profileservice.dto.response.UserProfileResponse;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Setter

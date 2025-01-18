@@ -1,6 +1,7 @@
 package com.nta.websocket.dto.response.internal;
 
 import com.nta.websocket.enums.internal.ProfileType;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
