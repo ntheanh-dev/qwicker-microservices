@@ -4,14 +4,6 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.nta.event.dto.DeliveryRequestEvent;
-import com.nta.event.dto.FindNearestShipperEvent;
-import com.nta.event.dto.PostMessageType;
-import com.nta.locationservice.dto.request.internal.ChangeAccountStatusRequest;
-import com.nta.locationservice.enums.internal.AccountStatus;
-import com.nta.locationservice.enums.internal.PostStatus;
-import com.nta.locationservice.repository.httpClient.IdentityClient;
-import com.nta.locationservice.repository.httpClient.PostClient;
 import org.springframework.data.geo.*;
 import org.springframework.data.redis.connection.RedisGeoCommands;
 import org.springframework.data.redis.core.GeoOperations;
@@ -19,11 +11,19 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import com.nta.event.dto.DeliveryRequestEvent;
+import com.nta.event.dto.FindNearestShipperEvent;
+import com.nta.event.dto.PostMessageType;
 import com.nta.event.dto.UpdateLocationEvent;
 import com.nta.locationservice.constant.RedisKey;
+import com.nta.locationservice.dto.request.internal.ChangeAccountStatusRequest;
 import com.nta.locationservice.enums.ErrorCode;
+import com.nta.locationservice.enums.internal.AccountStatus;
+import com.nta.locationservice.enums.internal.PostStatus;
 import com.nta.locationservice.exception.AppException;
 import com.nta.locationservice.model.ShipperDetailCache;
+import com.nta.locationservice.repository.httpClient.IdentityClient;
+import com.nta.locationservice.repository.httpClient.PostClient;
 
 import ch.hsr.geohash.GeoHash;
 import lombok.AccessLevel;
@@ -59,50 +59,56 @@ public class GeoHashService {
             final double latitude = post.getLatitude();
             final double longitude = post.getLongitude();
 
-            final List<String> joinedShipper = postClient.findAllJoinedShipperIdsByPostId(post.getPostId()).getResult();
+            final List<String> joinedShipper =
+                    postClient.findAllJoinedShipperIdsByPostId(post.getPostId()).getResult();
 
             if (joinedShipper.isEmpty()) {
-                getAllShipperDetailCacheByGeoHash(
-                        latitude, longitude)
-                        .keySet()
-                        .forEach(
-                                shipperId -> {
-                                    final boolean isShipperOnline = identityClient.isAccountOnline(shipperId).getResult();
-                                    final boolean isShipperReceivedMessage = redisService.containsElement("RECEIVED_MESSAGE:" + postId, shipperId);
-                                    if (!isShipperReceivedMessage && !isShipperOnline) {
-                                        try {
-                                            log.info("============== Pushing delivery request to shipper: {} ==============", shipperId);
-                                            kafkaTemplate.send("new-post", DeliveryRequestEvent.builder()
-                                                    .postId(key)
-                                                    .shipperId(shipperId)
-                                                    .postResponse(post.getPostResponse())
-                                                    .postMessageType(PostMessageType.DELIVERY_REQUEST)
-                                                    .build());
-                                            // Lưu lại những shipper da nhan msg
-                                            redisService.addToList(RedisKey.SHIPPER_RECEIVED_MSG + key, shipperId);
-                                        } catch (Exception e) {
-                                            log.error(e.getMessage());
-                                        }
-                                    }
-                                });
+                getAllShipperDetailCacheByGeoHash(latitude, longitude).keySet().forEach(shipperId -> {
+                    final boolean isShipperOnline =
+                            identityClient.isAccountOnline(shipperId).getResult();
+                    final boolean isShipperReceivedMessage =
+                            redisService.containsElement(RedisKey.SHIPPER_RECEIVED_MSG + ":" + postId, shipperId);
+                    if (!isShipperReceivedMessage && !isShipperOnline) {
+                        try {
+                            log.info(
+                                    "============== Pushing delivery request to shipper: {} ==============", shipperId);
+                            kafkaTemplate.send(
+                                    "new-post",
+                                    DeliveryRequestEvent.builder()
+                                            .postId(postId)
+                                            .shipperId(shipperId)
+                                            .postResponse(post.getPostResponse())
+                                            .postMessageType(PostMessageType.DELIVERY_REQUEST)
+                                            .build());
+                            // Lưu lại những shipper da nhan msg
+                            redisService.addToList(RedisKey.SHIPPER_RECEIVED_MSG + ":" + postId, shipperId);
+                        } catch (Exception e) {
+                            log.error(e.getMessage());
+                        }
+                    }
+                });
             } else {
                 final String winShipper = findNearestShipper(joinedShipper, postId, latitude, longitude);
 
                 log.debug("============== Shipper {} was approval to take {} post ==============", winShipper, postId);
                 try {
                     // notify figure out win shipper to user, and joined shippers
-                    kafkaTemplate.send("found-shipper", DeliveryRequestEvent.builder()
-                            .postId(postId)
-                            .shipperId(winShipper)
-                            .postResponse(post.getPostResponse())
-                            .postMessageType(PostMessageType.FOUND_SHIPPER)
-                            .build());
+                    kafkaTemplate.send(
+                            "found-shipper",
+                            DeliveryRequestEvent.builder()
+                                    .postId(postId)
+                                    .shipperId(winShipper)
+                                    .postResponse(post.getPostResponse())
+                                    .postMessageType(PostMessageType.FOUND_SHIPPER)
+                                    .build());
                     // update postStatus
                     postClient.changeStatus(postId, PostStatus.FOUND_SHIPPER.name());
                     // update account status
-                    identityClient.changeStatusById(winShipper, ChangeAccountStatusRequest.builder()
-                            .status(AccountStatus.SHIPPING)
-                            .build());
+                    identityClient.changeStatusById(
+                            winShipper,
+                            ChangeAccountStatusRequest.builder()
+                                    .status(AccountStatus.SHIPPING)
+                                    .build());
                 } catch (Exception e) {
                     log.error(e.getMessage());
                 }
@@ -119,11 +125,13 @@ public class GeoHashService {
      * @param joinedShipperIds shippers who want to take this order
      * @return shipperId
      */
-    public String findNearestShipper(final List<String> joinedShipperIds, final String postId, final double latitude, final double longitude) {
+    public String findNearestShipper(
+            final List<String> joinedShipperIds, final String postId, final double latitude, final double longitude) {
         if (joinedShipperIds.size() == 1) { // only one shipper joined
             return joinedShipperIds.getFirst();
         } else { // find nearest shipper
-            log.info("============== Found more than one shipper in this region, trying to find nearest shipper. ==============");
+            log.info(
+                    "============== Found more than one shipper in this region, trying to find nearest shipper. ==============");
             final Point myPoint = new Point(latitude, latitude);
             final Circle within = new Circle(myPoint, new Distance(999, Metrics.KILOMETERS));
             // Get all shipper points in redis and add them to GeoOperation
@@ -184,15 +192,15 @@ public class GeoHashService {
             final GeoHash geoHashObject = GeoHash.fromGeohashString(geoHash);
             // Lấy các geohash lân cận
             List<String> geoNeighbors = new ArrayList<>();
-            geoNeighbors.add(geoHash);  // Thêm geohash hiện tại vào danh sách các neighbors
+            geoNeighbors.add(geoHash); // Thêm geohash hiện tại vào danh sách các neighbors
             geoNeighbors.addAll(Arrays.stream(geoHashObject.getAdjacent())
-                    .map(GeoHash::toBase32)  // Chuyển các geohash lân cận thành chuỗi Base32
+                    .map(GeoHash::toBase32) // Chuyển các geohash lân cận thành chuỗi Base32
                     .toList());
 
             // Lấy dữ liệu từ Redis cho tất cả các geohash trong danh sách neighbors
             return geoNeighbors.stream()
                     .map(redisService::getField)
-                    .filter(Objects::nonNull)  // Kiểm tra null trước khi xử lý
+                    .filter(Objects::nonNull) // Kiểm tra null trước khi xử lý
                     .flatMap(m -> m.entrySet().stream())
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         }
@@ -202,7 +210,6 @@ public class GeoHashService {
         final GeoHash geoHash = GeoHash.withCharacterPrecision(latitude, longitude, GEOHASHING_PRECISION);
         return geoHash.toBase32();
     }
-
 
     public void updateLocation(final UpdateLocationEvent updateLocationEvent) {
         final String newGeoHash = getGeohashing(updateLocationEvent.getLatitude(), updateLocationEvent.getLongitude());

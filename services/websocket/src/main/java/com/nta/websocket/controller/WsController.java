@@ -47,6 +47,7 @@ public class WsController {
         if (wsMessage.getMessageType() != null
                 && wsMessage.getMessageType().equals(PostMessageType.UPDATE_SHIPPER_LOCATION)) {
             final UpdateLocationEvent event = objectMapper.readValue(wsMessage.getContent(), UpdateLocationEvent.class);
+            log.info("Received update location event: {}", event);
             kafkaTemplate.send("location-update-shipper-location", event);
         }
     }

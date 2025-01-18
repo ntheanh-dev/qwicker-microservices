@@ -1,6 +1,8 @@
 package com.nta.locationservice.configuration;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -24,4 +26,12 @@ public class ApplicationInitConfig {
     //
     //        };
     //    }
+
+    @Bean
+    public ThreadPoolTaskScheduler threadPoolTaskScheduler() {
+        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        scheduler.setThreadNamePrefix("ThreadPoolTaskScheduler__");
+        scheduler.setPoolSize(200);
+        return scheduler;
+    }
 }

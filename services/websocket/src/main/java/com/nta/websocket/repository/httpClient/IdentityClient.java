@@ -18,6 +18,6 @@ public interface IdentityClient {
     @PostMapping("/internal/accounts/find-by-ids")
     ApiResponse<List<Account>> findAllAccountsByIds(@RequestParam("ids") Set<String> ids);
 
-    @PostMapping("/{accountId}/change-status")
+    @PostMapping("/internal/accounts/{accountId}/change-status")
     ApiResponse<?> changeStatusById(@PathVariable("accountId") String id, @RequestBody ChangeAccountStatusRequest request);
 }

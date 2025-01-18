@@ -19,16 +19,16 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private static final String[] PUBLIC_ENDPOINTS = {
-        "/accounts/registration",
-        "/accounts/registration/sent-otp",
-        "/accounts/registration/verify-otp",
-        "/accounts/check-username-exists",
-        "/accounts/check-email-exists",
-        "/internal/accounts/find-by-ids",
-        "/auth/token",
-        "/auth/introspect",
-        "/auth/logout",
-        "/auth/refresh"
+            "/accounts/registration",
+            "/accounts/registration/sent-otp",
+            "/accounts/registration/verify-otp",
+            "/accounts/check-username-exists",
+            "/accounts/check-email-exists",
+            "/internal/accounts/**",
+            "/auth/token",
+            "/auth/introspect",
+            "/auth/logout",
+            "/auth/refresh"
     };
 
     private final CustomJwtDecoder customJwtDecoder;
