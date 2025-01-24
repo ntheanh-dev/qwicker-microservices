@@ -1,19 +1,9 @@
 package com.nta.websocket.controller;
 
-import java.io.IOException;
-import java.security.Principal;
-
-import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
-import org.springframework.stereotype.Controller;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nta.event.dto.DeliveryRequestEvent;
+import com.nta.event.dto.NotFoundShipperEvent;
 import com.nta.event.dto.PostMessageType;
 import com.nta.event.dto.UpdateLocationEvent;
 import com.nta.websocket.dto.response.internal.ShipperProfileResponse;
@@ -23,11 +13,19 @@ import com.nta.websocket.model.internal.PostStatus;
 import com.nta.websocket.repository.httpClient.PostClient;
 import com.nta.websocket.repository.httpClient.ProfileClient;
 import com.nta.websocket.service.AuthenticationService;
-
+import java.io.IOException;
+import java.security.Principal;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.stereotype.Controller;
 
 @Controller
 @RequiredArgsConstructor
@@ -54,8 +52,12 @@ public class WsController {
 
     @KafkaListener(topics = "new-post")
     public void newPostToTake(final DeliveryRequestEvent message) throws IOException {
-        log.info("New post: {}", message.getPostId());
         simpMessageSendingOperations.convertAndSend("/topic/shipper/" + message.getShipperId(), message);
+    }
+
+    @KafkaListener(topics = "finding-shipper-request-time-out")
+    public void newPostToTake(final NotFoundShipperEvent message) throws IOException {
+        simpMessageSendingOperations.convertAndSend("/topic/post/" + message.getPostId(), message);
     }
 
     //    @KafkaListener(topics = "find-shipper")

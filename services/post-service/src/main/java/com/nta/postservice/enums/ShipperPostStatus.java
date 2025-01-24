@@ -1,6 +1,7 @@
 package com.nta.postservice.enums;
 
 public enum ShipperPostStatus {
-    JOINED,
-    APPROVAL
+  PENDING,
+  REJECTED,
+  ACCEPTED
 }

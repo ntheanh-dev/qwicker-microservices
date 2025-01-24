@@ -61,7 +61,7 @@ public class ApplicationInitConfig {
                         .name("Xe Máy")
                         .description("Vận chuyển mặt hàng nhỏ giá trị đến 3 triệu đồng")
                         .capacity(
-                                "'2', '0.5 x 0.4 x 0.5 Mét - Lên đến 30kg', 'Vận chuyển mặt hàng nhỏ giá trị đến 3 triệu đồng', 'https://res.cloudinary.com/dqpo9h5s2/image/upload/v1706106196/vehicle_icon/gjisuqtnu1gl7rtpdron.png', 'Xe Máy'\n")
+                                "0.5 x 0.4 x 0.5 Mét Lên đến 30kg")
                         .build());
                 vehicleRepository.save(Vehicle.builder()
                         .id("2")
