@@ -1,9 +1,7 @@
 package com.nta.identity.entity;
 
-import java.util.Set;
-
 import jakarta.persistence.*;
-
+import java.util.Set;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -31,7 +29,7 @@ public class Account {
     @ManyToMany
     Set<Role> roles;
 
-    @Column(length = 15, columnDefinition = "varchar(15) default 'OFFLINE'")
+    @Column(length = 15, columnDefinition = "varchar(25) default 'OFFLINE'")
     @Enumerated(EnumType.STRING)
     AccountStatus status;
 }

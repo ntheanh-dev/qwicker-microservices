@@ -1,14 +1,11 @@
 package com.nta.postservice.controller.internal;
 
-import java.util.List;
-
-import org.springframework.web.bind.annotation.*;
-
 import com.nta.postservice.dto.response.ApiResponse;
 import com.nta.postservice.enums.PostStatus;
 import com.nta.postservice.service.PostService;
-
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/internal/posts")
@@ -51,9 +48,9 @@ public class InternalPostController {
                 .build();
     }
 
-    @GetMapping("/{id}/change-status")
+    @PostMapping("/{id}/change-status/{status}")
     ApiResponse<?> changeStatus(
-            @PathVariable(name = "id") String postId, @RequestParam(name = "status") String status) {
+            @PathVariable(name = "id") String postId, @PathVariable(name = "status") String status) {
         postService.changeStatus(postId, status);
         return ApiResponse.builder().build();
     }

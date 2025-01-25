@@ -222,8 +222,17 @@ public class PostService {
   public void changeStatus(final String postId, final String status) {
     final PostStatus postStatus = convertToEnum(status);
     final Post post = postRepository.findById(postId).get();
+    PostHistory history = PostHistory.builder().post(post).build();
     post.setStatus(postStatus);
     postRepository.save(post);
+
+    switch (postStatus) {
+      case PostStatus.PENDING:
+        break;
+      case PostStatus.TIMED_OUT:
+        history.setStatus(PostStatus.TIMED_OUT);
+        break;
+    }
   }
 
   public PostStatus findPostStatusByPostId(final String postId) {

@@ -17,43 +17,43 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class GoogMapClientService {
-    private final GoogMapClient googMapClient;
-    private static final String KEY = "mSU8H8q4TEUcZmaniecYM0Tm4RLQuKOqAC8kzhGr";
+  private final GoogMapClient googMapClient;
+  private static final String KEY = "mSU8H8q4TEUcZmaniecYM0Tm4RLQuKOqAC8kzhGr";
 
-    public int getNearestShipperIndex(final String origin, final List<String> destinations) {
-        List<GoogMapDistanceMatrixApiResponse> responses = getGoogMapDistanceMatrixAsync(origin, destinations);
-        return responses.stream()
-                .map(r -> r.getRows()
-                        .getFirst()
-                        .getElements()
-                        .getFirst()
-                        .getDuration()
-                        .getValue())
-                .min(Integer::compareTo)
-                .orElse(0);
-    }
+  public int getNearestShipperIndex(final String origin, final List<String> destinations) {
+    List<GoogMapDistanceMatrixApiResponse> responses =
+        getGoogMapDistanceMatrixAsync(origin, destinations);
+    return responses.stream()
+        .map(r -> r.getRows().getFirst().getElements().getFirst().getDuration().getValue())
+        .min(Integer::compareTo)
+        .orElse(0);
+  }
 
-    private List<GoogMapDistanceMatrixApiResponse> getGoogMapDistanceMatrixAsync(
-            final String origin, final List<String> destinations) {
-        List<CompletableFuture<GoogMapDistanceMatrixApiResponse>> futures = destinations.stream()
-                .map(d -> CompletableFuture.supplyAsync(() -> {
-                            try {
+  private List<GoogMapDistanceMatrixApiResponse> getGoogMapDistanceMatrixAsync(
+      final String origin, final List<String> destinations) {
+    List<CompletableFuture<GoogMapDistanceMatrixApiResponse>> futures =
+        destinations.stream()
+            .map(
+                d ->
+                    CompletableFuture.supplyAsync(
+                            () -> {
+                              try {
                                 return googMapClient.getDistance(origin, d, "car", KEY);
-
-                            } catch (Exception e) {
+                              } catch (Exception e) {
                                 log.error("Cannot call API Bing Map {}", e.getMessage());
                                 return null;
-                            }
-                        })
-                        .exceptionally(ex -> {
-                            log.error("Error when execute async tasks: {}", ex.getMessage());
-                            return null;
-                        }))
-                .toList();
+                              }
+                            })
+                        .exceptionally(
+                            ex -> {
+                              log.error("Error when execute async tasks: {}", ex.getMessage());
+                              return null;
+                            }))
+            .toList();
 
-        return futures.stream()
-                .map(CompletableFuture::join)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-    }
+    return futures.stream()
+        .map(CompletableFuture::join)
+        .filter(Objects::nonNull)
+        .collect(Collectors.toList());
+  }
 }

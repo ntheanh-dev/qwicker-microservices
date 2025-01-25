@@ -1,23 +1,19 @@
 package com.nta.identity.controller;
 
-import java.util.List;
-
-import jakarta.validation.Valid;
-
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
 import com.nta.identity.dto.request.*;
 import com.nta.identity.dto.response.AccountResponse;
 import com.nta.identity.dto.response.ApiResponse;
 import com.nta.identity.dto.response.DataExistResponse;
 import com.nta.identity.service.AccountService;
 import com.nta.identity.service.AuthenticationService;
-
+import jakarta.validation.Valid;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/accounts")
@@ -60,6 +56,13 @@ public class AccountController {
         return ApiResponse.<AccountResponse>builder()
                 .result(accountService.getAccount(accountId))
                 .build();
+    }
+
+    @PostMapping("/change-status")
+    ApiResponse<?> changeStatusById(@RequestBody ChangeAccountStatusRequest request) {
+        final String accountId = authenticationService.getAccountIdFromCurrentToken();
+        accountService.changeStatusById(accountId, request.getStatus());
+        return ApiResponse.builder().build();
     }
 
     //    @GetMapping("/my-info")

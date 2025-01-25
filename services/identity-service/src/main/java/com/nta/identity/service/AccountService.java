@@ -1,17 +1,5 @@
 package com.nta.identity.service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import jakarta.transaction.Transactional;
-
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
 import com.nta.event.dto.NotificationEvent;
 import com.nta.identity.constant.PredefinedRole;
 import com.nta.identity.dto.request.*;
@@ -28,11 +16,19 @@ import com.nta.identity.mapper.ProfileMapper;
 import com.nta.identity.repository.AccountRepository;
 import com.nta.identity.repository.RoleRepository;
 import com.nta.identity.repository.httpClient.ProfileClient;
-
+import jakarta.transaction.Transactional;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -181,11 +177,7 @@ public class AccountService {
         accountRepository.save(account);
     }
 
-    public boolean isAccountOnline(final String accountId) {
-        return accountRepository
-                .findById(accountId)
-                .map(Account::getStatus)
-                .orElse(AccountStatus.OFFLINE)
-                .equals(AccountStatus.ONLINE);
+    public boolean isReadyForTakeOrder(final String accountId) {
+        return accountRepository.isReadyForTakeOrder(accountId);
     }
 }
