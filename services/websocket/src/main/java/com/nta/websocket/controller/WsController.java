@@ -7,7 +7,6 @@ import com.nta.event.dto.NotFoundShipperEvent;
 import com.nta.event.dto.PostMessageType;
 import com.nta.event.dto.UpdateLocationEvent;
 import com.nta.websocket.model.WsMessage;
-import com.nta.websocket.model.internal.PostStatus;
 import com.nta.websocket.repository.httpClient.PostClient;
 import com.nta.websocket.repository.httpClient.ProfileClient;
 import com.nta.websocket.service.AuthenticationService;
@@ -79,48 +78,48 @@ public class WsController {
 //            .build());
 //  }
 
-  @MessageMapping("/post/{postId}")
-  public void post(
-      @Payload WsMessage wsMessage, @DestinationVariable String postId, Principal principal) {
-    if (wsMessage.getMessageType() == null) return;
-    switch (wsMessage.getMessageType()) {
-      case PostMessageType.REQUEST_JOIN_POST -> {
-        final PostStatus currentPostStatus = postClient.findStatusByPostId(postId).getResult();
-        final var currentShipper = authenticationService.getUserDetail(principal);
-        if (currentPostStatus == PostStatus.PENDING) {
-          final Boolean joinedBefore =
-              postClient.isShipperJoinPost(postId, currentShipper.getId()).getResult();
-          if (joinedBefore) {
-
-          } else {
-            postClient.shipperJoinPost(postId, currentShipper.getId());
-            // -------Update num joined shipper
-            simpMessageSendingOperations.convertAndSend(
-                "/topic/post/" + postId,
-                WsMessage.builder()
-                    .messageType(PostMessageType.NUM_SHIPPER_JOINED)
-                    .content(String.valueOf(postClient.countShipperJoinedByPostId(postId)))
-                    .build());
-            log.info("Shipper: {}, joined post: {}", currentShipper.getId(), postId);
-          }
-        } else {
-          simpMessageSendingOperations.convertAndSend(
-              "/topic/post/" + postId,
-              WsMessage.builder().messageType(PostMessageType.POST_WAS_TAKEN).build());
-        }
-      }
-      case PostMessageType.SHIPPER_LOCATION -> {
-        //                final UpdateShipperLocationRequest s =
-        //                        objectMapper.readValue(wsMessage.getContent(),
-        // UpdateShipperLocationRequest.class);
-        //                simpMessageSendingOperations.convertAndSend(
-        //                        "/topic/post/" + postId,
-        //                        ShipperLocationResponse.builder()
-        //                                .latitude(s.getLatitude())
-        //                                .longitude(s.getLongitude())
-        //                                .messageType(MessageType.SHIPPER_LOCATION)
-        //                                .build());
-      }
-    }
-  }
+//  @MessageMapping("/post/{postId}")
+//  public void post(
+//      @Payload WsMessage wsMessage, @DestinationVariable String postId, Principal principal) {
+//    if (wsMessage.getMessageType() == null) return;
+//    switch (wsMessage.getMessageType()) {
+//      case PostMessageType.REQUEST_JOIN_POST -> {
+//        final PostStatus currentPostStatus = postClient.findStatusByPostId(postId).getResult();
+//        final var currentShipper = authenticationService.getUserDetail(principal);
+//        if (currentPostStatus == PostStatus.PENDING) {
+//          final Boolean joinedBefore =
+//              postClient.isShipperJoinPost(postId, currentShipper.getId()).getResult();
+//          if (joinedBefore) {
+//
+//          } else {
+//            postClient.shipperJoinPost(postId, currentShipper.getId());
+//            // -------Update num joined shipper
+//            simpMessageSendingOperations.convertAndSend(
+//                "/topic/post/" + postId,
+//                WsMessage.builder()
+//                    .messageType(PostMessageType.NUM_SHIPPER_JOINED)
+//                    .content(String.valueOf(postClient.countShipperJoinedByPostId(postId)))
+//                    .build());
+//            log.info("Shipper: {}, joined post: {}", currentShipper.getId(), postId);
+//          }
+//        } else {
+//          simpMessageSendingOperations.convertAndSend(
+//              "/topic/post/" + postId,
+//              WsMessage.builder().messageType(PostMessageType.POST_WAS_TAKEN).build());
+//        }
+//      }
+//      case PostMessageType.SHIPPER_LOCATION -> {
+//        //                final UpdateShipperLocationRequest s =
+//        //                        objectMapper.readValue(wsMessage.getContent(),
+//        // UpdateShipperLocationRequest.class);
+//        //                simpMessageSendingOperations.convertAndSend(
+//        //                        "/topic/post/" + postId,
+//        //                        ShipperLocationResponse.builder()
+//        //                                .latitude(s.getLatitude())
+//        //                                .longitude(s.getLongitude())
+//        //                                .messageType(MessageType.SHIPPER_LOCATION)
+//        //                                .build());
+//      }
+//    }
+//  }
 }

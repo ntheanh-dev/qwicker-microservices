@@ -18,10 +18,14 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
   private static final String[] GET_PUBLIC_ENDPOINTS = {
-    "/vehicles", "/product-category", "/internal/posts/**"
+    "/vehicles", "/product-category", "/internal/posts/**", "/internal/shipper-post/**"
   };
   private static final String[] POST_PUBLIC_ENDPOINTS = {
-    "/vehicles", "/product-category", "/internal/posts/**"
+    "/vehicles",
+    "/product-category",
+    "/internal/posts/**",
+    "/internal/shipper-post",
+    "/internal/post-history"
   };
 
   @Autowired private final CustomJwtDecoder customJwtDecoder;

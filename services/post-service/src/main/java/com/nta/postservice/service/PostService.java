@@ -12,11 +12,7 @@ import com.nta.postservice.dto.response.internal.UploadImageResponse;
 import com.nta.postservice.entity.Post;
 import com.nta.postservice.entity.PostHistory;
 import com.nta.postservice.entity.Product;
-import com.nta.postservice.entity.ShipperPost;
-import com.nta.postservice.enums.ErrorCode;
-import com.nta.postservice.enums.PaymentMethod;
-import com.nta.postservice.enums.PostStatus;
-import com.nta.postservice.enums.ShipperPostStatus;
+import com.nta.postservice.enums.*;
 import com.nta.postservice.exception.AppException;
 import com.nta.postservice.mapper.PostMapper;
 import com.nta.postservice.mapper.ProductMapper;
@@ -108,7 +104,7 @@ public class PostService {
     // ---------------Post History----------------
     postHistoryRepository.save(
         PostHistory.builder()
-            .status(PostStatus.PENDING)
+            .status(PostHistoryStatus.ADDED)
             .post(post)
             .description("Post was created")
             .build());
@@ -171,6 +167,12 @@ public class PostService {
     return postResponse;
   }
 
+  public Post findById(final String id) {
+    return postRepository
+        .findById(id)
+        .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND));
+  }
+
   public List<PostResponse> getPostsByStatusList(final String statusList) {
     final var currentUser = authenticationService.getUserDetail();
     if (statusList == null || statusList.isEmpty()) {
@@ -219,45 +221,15 @@ public class PostService {
     }
   }
 
-  public void changeStatus(final String postId, final String status) {
-    final PostStatus postStatus = convertToEnum(status);
-    final Post post = postRepository.findById(postId).get();
-    PostHistory history = PostHistory.builder().post(post).build();
-    post.setStatus(postStatus);
-    postRepository.save(post);
-
-    switch (postStatus) {
-      case PostStatus.PENDING:
-        break;
-      case PostStatus.TIMED_OUT:
-        history.setStatus(PostStatus.TIMED_OUT);
-        break;
+  public void update(final String postId, final Post update) {
+    final Post origin = postRepository.findById(postId).get();
+    if (update.getStatus() != null) {
+      origin.setStatus(update.getStatus());
     }
+    postRepository.save(origin);
   }
 
   public PostStatus findPostStatusByPostId(final String postId) {
     return postRepository.findPostStatusByPostId(postId);
-  }
-
-  public void shipperJoinPost(final String postId, final String shipperId) {
-    shipperPostRepository.save(
-        ShipperPost.builder()
-            .shipper(shipperId)
-            .joinedAt(LocalDateTime.now())
-            .status(ShipperPostStatus.ACCEPTED)
-            .post(postRepository.findById(postId).get())
-            .build());
-  }
-
-  Boolean isShipperJoinPost(final String postId, final String shipperId) {
-    return shipperPostRepository.existsByShipperAndPostId(shipperId, postId);
-  }
-
-  public Integer countShipperJoinByPostId(final String postId) {
-    return shipperPostRepository.countShipperJoinedByPostId(postId);
-  }
-
-  public List<String> findAllJoinedShipperIdsByPostId(final String postId) {
-    return shipperPostRepository.findAllJoinedShipperIdsByPostId(postId);
   }
 }

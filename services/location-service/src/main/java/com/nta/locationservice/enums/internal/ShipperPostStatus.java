@@ -1,4 +1,4 @@
-package com.nta.postservice.enums;
+package com.nta.locationservice.enums.internal;
 
 public enum ShipperPostStatus {
   INVITED,

@@ -12,20 +12,23 @@ import com.nta.websocket.model.internal.PostStatus;
 
 @FeignClient(name = "post-service", url = "${application.config.post-url}")
 public interface PostClient {
-    @GetMapping("internal/posts/{id}/find-status")
-    ApiResponse<PostStatus> findStatusByPostId(@PathVariable String id);
-
-    @GetMapping("internal/posts/{id}/count-shipper-join")
-    ApiResponse<Integer> countShipperJoinedByPostId(@PathVariable(name = "id") String id);
-
-    @PostMapping("/{post-id}/shipper-join/{shipper-id}")
-    ApiResponse<?> shipperJoinPost(
-            @PathVariable(name = "post-id") String postId, @PathVariable(name = "shipper-id") String shipperId);
-
-    @GetMapping("/{post-id}/is-shipper-join/{shipper-id}")
-    ApiResponse<Boolean> isShipperJoinPost(
-            @PathVariable(name = "post-id") String postId, @PathVariable(name = "shipper-id") String shipperId);
-
-    @GetMapping("/{id}/find-shipper-join")
-    ApiResponse<List<String>> findAllJoinedShipperIdsByPostId(@PathVariable(name = "id") String postId);
+  //    @GetMapping("internal/posts/{id}/find-status")
+  //    ApiResponse<PostStatus> findStatusByPostId(@PathVariable String id);
+  //
+  //    @GetMapping("internal/posts/{id}/count-shipper-join")
+  //    ApiResponse<Integer> countShipperJoinedByPostId(@PathVariable(name = "id") String id);
+  //
+  //    @PostMapping("/{post-id}/shipper-join/{shipper-id}")
+  //    ApiResponse<?> shipperJoinPost(
+  //            @PathVariable(name = "post-id") String postId, @PathVariable(name = "shipper-id")
+  // String shipperId);
+  //
+  //    @GetMapping("/{post-id}/is-shipper-join/{shipper-id}")
+  //    ApiResponse<Boolean> isShipperJoinPost(
+  //            @PathVariable(name = "post-id") String postId, @PathVariable(name = "shipper-id")
+  // String shipperId);
+  //
+  //    @GetMapping("/{id}/find-shipper-join")
+  //    ApiResponse<List<String>> findAllJoinedShipperIdsByPostId(@PathVariable(name = "id") String
+  // postId);
 }

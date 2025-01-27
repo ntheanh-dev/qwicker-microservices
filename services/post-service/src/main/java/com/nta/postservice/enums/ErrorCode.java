@@ -1,9 +1,8 @@
 package com.nta.postservice.enums;
 
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
-
-import lombok.Getter;
 
 @Getter
 public enum ErrorCode {
@@ -17,6 +16,7 @@ public enum ErrorCode {
     INVALID_POST_STATUS(1011, "Invalid post status", HttpStatus.BAD_REQUEST),
     VEHICLE_NOT_FOUND(1012, "Vehicle not found", HttpStatus.BAD_REQUEST),
     JOINED_POST_BEFORE(1013, "Joined post before", HttpStatus.BAD_REQUEST),
+    OBJECT_NOT_FOUND(1014, "Object not found", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
