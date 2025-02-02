@@ -2,16 +2,11 @@ package com.nta.websocket.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nta.event.dto.DeliveryRequestEvent;
-import com.nta.event.dto.NotFoundShipperEvent;
-import com.nta.event.dto.PostMessageType;
-import com.nta.event.dto.UpdateLocationEvent;
+import com.nta.event.dto.*;
 import com.nta.websocket.model.WsMessage;
 import com.nta.websocket.repository.httpClient.PostClient;
 import com.nta.websocket.repository.httpClient.ProfileClient;
 import com.nta.websocket.service.AuthenticationService;
-import java.io.IOException;
-import java.security.Principal;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -24,45 +19,54 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Controller;
 
+import java.io.IOException;
+import java.security.Principal;
+
 @Controller
 @RequiredArgsConstructor
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class WsController {
-  SimpMessageSendingOperations simpMessageSendingOperations;
-  ObjectMapper objectMapper;
-  KafkaTemplate<String, Object> kafkaTemplate;
-  AuthenticationService authenticationService;
-  ProfileClient profileClient;
-  PostClient postClient;
+    SimpMessageSendingOperations simpMessageSendingOperations;
+    ObjectMapper objectMapper;
+    KafkaTemplate<String, Object> kafkaTemplate;
+    AuthenticationService authenticationService;
+    ProfileClient profileClient;
+    PostClient postClient;
 
-  @MessageMapping({
-    "/shipper/{shipperId}",
-  })
-  public void updateLocation(
-      @Payload WsMessage wsMessage, @DestinationVariable String shipperId, Principal principal)
-      throws JsonProcessingException {
-    if (wsMessage.getMessageType() != null
-        && wsMessage.getMessageType().equals(PostMessageType.UPDATE_SHIPPER_LOCATION)) {
-      final UpdateLocationEvent event =
-          objectMapper.readValue(wsMessage.getContent(), UpdateLocationEvent.class);
-      log.info("Received update location event: {}", event);
-      kafkaTemplate.send("location-update-shipper-location", event);
+    @MessageMapping({
+            "/shipper/{shipperId}",
+    })
+    public void updateLocation(
+            @Payload WsMessage wsMessage, @DestinationVariable String shipperId, Principal principal)
+            throws JsonProcessingException {
+        if (wsMessage.getMessageType() != null
+                && wsMessage.getMessageType().equals(PostMessageType.UPDATE_SHIPPER_LOCATION)) {
+            final UpdateLocationEvent event =
+                    objectMapper.readValue(wsMessage.getContent(), UpdateLocationEvent.class);
+            log.info("Received update location event: {}", event);
+            kafkaTemplate.send("location-update-shipper-location", event);
+        }
     }
-  }
 
-  @KafkaListener(topics = "new-post", groupId = "ws-group")
-  public void newPostToTake(final DeliveryRequestEvent message) throws IOException {
-    // TODO Handle sending message when user offline
-    simpMessageSendingOperations.convertAndSend(
-        "/topic/shipper/" + message.getShipperId(), message);
-  }
+    @KafkaListener(topics = "new-post", groupId = "ws-group")
+    public void newPostToTake(final DeliveryRequestEvent message) throws IOException {
+        // TODO Handle sending message when user offline
+        simpMessageSendingOperations.convertAndSend(
+                "/topic/shipper/" + message.getShipperId(), message);
+    }
 
-  @KafkaListener(topics = "finding-shipper-request-time-out", groupId = "ws-group")
-  public void newPostToTake(final NotFoundShipperEvent message) throws IOException {
-    // TODO Handle sending message when user offline
-    simpMessageSendingOperations.convertAndSend("/topic/post/" + message.getPostId(), message);
-  }
+    @KafkaListener(topics = "finding-shipper-request-time-out", groupId = "ws-group")
+    public void newPostToTake(final NotFoundShipperEvent message) throws IOException {
+        // TODO Handle sending message when user offline
+        simpMessageSendingOperations.convertAndSend("/topic/post/" + message.getPostId(), message);
+    }
+
+    @KafkaListener(topics = "shipment-accept", groupId = "ws-group")
+    public void shipmentAccept(final ShipperRequestTakePostEvent message) throws IOException {
+        // TODO Handle sending message when user offline
+        simpMessageSendingOperations.convertAndSend("/topic/post/" + message.getPostId(), message);
+    }
 
 //  @KafkaListener(topics = "found-shipper")
 //  public void foundAppropriateShipperToTakeOrder(final DeliveryRequestEvent message)

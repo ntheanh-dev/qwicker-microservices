@@ -19,6 +19,7 @@ application:
     file-url: http://localhost:8084/file
     location-url: http://localhost:8086/location
     payment-url: http://localhost:8087/payment
+    profile-url: http://localhost:8081/profile
 
 server:
   port: 8085

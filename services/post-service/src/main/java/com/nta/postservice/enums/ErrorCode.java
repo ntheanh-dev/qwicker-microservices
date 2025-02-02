@@ -17,6 +17,8 @@ public enum ErrorCode {
     VEHICLE_NOT_FOUND(1012, "Vehicle not found", HttpStatus.BAD_REQUEST),
     JOINED_POST_BEFORE(1013, "Joined post before", HttpStatus.BAD_REQUEST),
     OBJECT_NOT_FOUND(1014, "Object not found", HttpStatus.BAD_REQUEST),
+    POST_TAKEN_BY_ANOTHER_SHIPPER(1015, "The post has already been taken by another shipper", HttpStatus.BAD_REQUEST),
+    SHIPPER_POST_NOT_FOUND(1016, "Shipper post not found", HttpStatus.NOT_FOUND),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
