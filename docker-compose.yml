@@ -11,8 +11,6 @@ services:
       - postgres:/data/postgres
     ports:
       - "5432:5432"
-    networks:
-      - app-network
     restart: unless-stopped
 
   pgadmin:
@@ -27,8 +25,6 @@ services:
       - pgadmin:/var/lib/pgadmin
     ports:
       - "5050:80"
-    networks:
-      - app-network
     restart: unless-stopped
 
   kafka:
@@ -60,21 +56,17 @@ services:
 
   redis:
     platform: linux/amd64
-    image: redis:7.4
+    image: redis:7.4.2
     container_name: redis
     ports:
       - '6380:6379'
     restart: always
-    networks:
-      - app-network
   redis-insight:
     platform: linux/amd64
     image: redis/redisinsight:2.60
     container_name: redis-insight
     ports:
       - '5540:5540'
-    networks:
-      - app-network
     depends_on:
       - redis
   mongo:
@@ -86,10 +78,6 @@ services:
     environment:
       MONGODB_ROOT_USER: root
       MONGODB_ROOT_PASSWORD: Admin@123
-
-networks:
-  app-network:
-    driver: bridge
 
 volumes:
   postgres:

@@ -47,7 +47,7 @@ public class ShipperRequestHandler {
 
   public void startPost(final FindNearestShipperEvent message) {
     log.info("Received a post: {}", message.getPostId());
-    final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     scheduler.scheduleWithFixedDelay(
         () -> {
           if (processShipperFinding(message)) {

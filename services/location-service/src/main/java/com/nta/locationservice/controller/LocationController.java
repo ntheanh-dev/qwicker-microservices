@@ -3,18 +3,20 @@ package com.nta.locationservice.controller;
 import com.nta.event.dto.FindNearestShipperEvent;
 import com.nta.event.dto.UpdateLocationEvent;
 import com.nta.locationservice.service.GeoHashService;
-import java.io.IOException;
-
 import com.nta.locationservice.service.ShipperRequestHandler;
+import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Controller;
 
 @Controller
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
+@Slf4j
 public class LocationController {
   GeoHashService geoHashService;
   ShipperRequestHandler shipperRequestHandler;
@@ -25,7 +27,15 @@ public class LocationController {
   }
 
   @KafkaListener(topics = "find-nearest-shipper")
-  public void listenFindNearestShipper(final FindNearestShipperEvent message) throws IOException {
-    shipperRequestHandler.startPost(message);
+  public void listenFindNearestShipper(final FindNearestShipperEvent message) {
+    CompletableFuture.runAsync(
+        () -> {
+          try {
+            shipperRequestHandler.startPost(message);
+          } catch (Exception e) {
+            log.error("Error processing message for postId: {}", message.getPostId(), e);
+            // Optionally send to DLT or take additional actions.
+          }
+        });
   }
 }

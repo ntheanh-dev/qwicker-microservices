@@ -6,14 +6,13 @@ import com.nta.postservice.dto.response.ApiResponse;
 import com.nta.postservice.dto.response.PostResponse;
 import com.nta.postservice.entity.Post;
 import com.nta.postservice.service.PostService;
+import java.util.List;
+import java.util.Map;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/posts")
@@ -36,7 +35,7 @@ public class PostController {
                 .build();
     }
 
-    @GetMapping("/{id}/shipment-accept")
+    @PostMapping("/{id}/shipment-accept")
     @PreAuthorize("hasRole('SHIPPER')")
     ApiResponse<?> accept(@PathVariable String id) {
         postService.accept(id);

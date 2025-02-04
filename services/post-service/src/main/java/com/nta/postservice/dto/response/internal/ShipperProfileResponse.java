@@ -1,10 +1,8 @@
 package com.nta.postservice.dto.response.internal;
 
-import com.nta.profileservice.dto.response.internal.RatingResponse;
+import java.util.Set;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.Set;
 
 @Data
 @AllArgsConstructor
