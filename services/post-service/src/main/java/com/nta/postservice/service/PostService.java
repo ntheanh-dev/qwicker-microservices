@@ -87,7 +87,6 @@ public class PostService {
                         .getResult();
         final DeliveryLocationResponse dropLocation =
                 locationClient.createDeliveryLocation(request.getShipment().getDropLocation()).getResult();
-        log.info(authenticationService.getUserDetail().getId());
         // ---------------Post----------------------
         final Post post =
                 postRepository.save(

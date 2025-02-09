@@ -19,15 +19,15 @@ public enum ErrorCode {
     OBJECT_NOT_FOUND(1014, "Object not found", HttpStatus.BAD_REQUEST),
     POST_TAKEN_BY_ANOTHER_SHIPPER(1015, "The post has already been taken by another shipper", HttpStatus.BAD_REQUEST),
     SHIPPER_POST_NOT_FOUND(1016, "Shipper post not found", HttpStatus.NOT_FOUND),
+    RATING_NOT_FOUND(1017, "Rating not found", HttpStatus.NOT_FOUND),
     ;
 
+    private final int code;
+    private final String message;
+    private final HttpStatusCode statusCode;
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;
         this.message = message;
         this.statusCode = statusCode;
     }
-
-    private final int code;
-    private final String message;
-    private final HttpStatusCode statusCode;
 }
