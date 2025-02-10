@@ -12,11 +12,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RatingResponse {
-    String raterId;
-    String shipperId;
-    String postId;
-    double rating;
-    String feedback;
-    LocalDateTime createdAt;
-    UserProfileResponse user;
+  String raterId;
+  String shipperId;
+  String postId;
+  double rating;
+  String feedback;
+  LocalDateTime createdAt;
+  UserProfileResponse raterInfo;
 }

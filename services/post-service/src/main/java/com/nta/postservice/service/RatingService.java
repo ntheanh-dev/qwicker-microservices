@@ -7,15 +7,14 @@ import com.nta.postservice.entity.Post;
 import com.nta.postservice.entity.Rating;
 import com.nta.postservice.repository.RatingRepository;
 import com.nta.postservice.repository.httpClient.ProfileClient;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -57,7 +56,7 @@ public class RatingService {
                     .createdAt(r.getCreatedAt())
                     .feedback(r.getFeedback())
                     .rating(r.getRating())
-                    .user(raterInfo)
+                    .raterInfo(raterInfo)
                     .build();
         }).toList();
     }

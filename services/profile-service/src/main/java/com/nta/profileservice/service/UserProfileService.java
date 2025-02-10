@@ -10,15 +10,14 @@ import com.nta.profileservice.mapper.ProfileMapper;
 import com.nta.profileservice.model.AuthenticatedUserDetail;
 import com.nta.profileservice.repository.ProfileRepository;
 import com.nta.profileservice.repository.httpClient.FileClient;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -60,6 +59,6 @@ public class UserProfileService {
 
     public Map<String, UserProfileResponse> getUserProfilesByIds(final List<String> userIds) {
         final List<Profile> userProfiles = profileRepository.findByAccountIdIn(userIds);
-        return userProfiles.stream().collect(Collectors.toMap(Profile::getId, profileMapper::toUserProfileResponse));
+        return userProfiles.stream().collect(Collectors.toMap(Profile::getAccountId, profileMapper::toUserProfileResponse));
     }
 }

@@ -1,7 +1,6 @@
 package com.nta.websocket.dto.response.internal;
 
-import java.util.Set;
-
+import java.util.List;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -11,11 +10,12 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ShipperProfileResponse {
-    String accountId;
-    UserProfileResponse profile;
-    String vehicleNumber;
-    String vehicleId;
-    String identityF;
-    String identityB;
-    Set<RatingResponse> ratings;
+  String accountId;
+  UserProfileResponse profile;
+  String vehicleNumber;
+  String vehicleId;
+  String identityF;
+  String identityB;
+  double ratingAverage;
+  List<RatingResponse> ratings;
 }

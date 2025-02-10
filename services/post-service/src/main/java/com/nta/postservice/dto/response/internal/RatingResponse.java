@@ -1,9 +1,8 @@
 package com.nta.postservice.dto.response.internal;
 
+import java.time.LocalDateTime;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -17,5 +16,5 @@ public class RatingResponse {
     double rating;
     String feedback;
     LocalDateTime createdAt;
-    UserProfileResponse user;
+    UserProfileResponse raterInfo;
 }
