@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nta.event.dto.FindNearestShipperEvent;
 import com.nta.event.dto.PostMessageType;
 import com.nta.event.dto.ShipperRequestTakePostEvent;
+import com.nta.event.dto.UpdatePostStatusRequestEvent;
 import com.nta.postservice.dto.request.PostCreationRequest;
 import com.nta.postservice.dto.request.internal.Payment;
 import com.nta.postservice.dto.request.internal.UploadImageRequest;
@@ -100,13 +101,13 @@ public class PostService {
                 .postTime(LocalDateTime.now())
                 .status(
                     request.getPayment().getMethod().equals(PaymentMethod.CASH)
-                        ? PostStatus.PENDING
+                        ? PostStatus.ORDER_CREATED
                         : PostStatus.WAITING_PAY)
                 .build());
     // ---------------Post History----------------
     postHistoryRepository.save(
         PostHistory.builder()
-            .status(PostHistoryStatus.ADDED)
+            .status(PostHistoryStatus.ORDER_CREATED)
             .post(post)
             .description("Post was created")
             .build());
@@ -150,7 +151,7 @@ public class PostService {
   public PostResponse findById(final Map<String, String> params, final String id) {
     Post p = null;
     if (params.containsKey("status")) {
-      final PostStatus postStatus = convertToEnum(params.get("status"));
+      final PostStatus postStatus = PostStatus.fromCode(params.get("status"));
       p =
           postRepository
               .findPostByIdAndStatus(id, postStatus)
@@ -173,17 +174,15 @@ public class PostService {
   public void accept(final String id) {
     final Post post =
         postRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND));
-    if (post.getStatus().equals(PostStatus.FOUND_SHIPPER)) {
-      throw new AppException(ErrorCode.POST_TAKEN_BY_ANOTHER_SHIPPER);
-    }
-    post.setStatus(PostStatus.FOUND_SHIPPER);
+
+    post.setStatus(PostStatus.SHIPPER_FOUND);
     postRepository.save(post);
     // insert postHistory entity
     final PostHistory postHistory =
         PostHistory.builder()
             .post(post)
             .statusChangeDate(LocalDateTime.now())
-            .status(PostHistoryStatus.ACCEPTED)
+            .status(PostHistoryStatus.SHIPPER_FOUND)
             .build();
     postHistoryRepository.save(postHistory);
     // update shipperPost entity
@@ -216,7 +215,7 @@ public class PostService {
         ShipperRequestTakePostEvent.builder()
             .postId(id)
             .shipperId(shipperId)
-            .postMessageType(PostMessageType.FOUND_SHIPPER)
+            .postMessageType(PostMessageType.SHIPPER_FOUND)
             .shipperProfile(shipperProfileResponseString)
             .build());
   }
@@ -232,9 +231,14 @@ public class PostService {
     if (statusList == null || statusList.isEmpty()) {
       return postMapper.toPostResponseList(postRepository.findPostsByUserId(currentUser.getId()));
     }
+    log.info("statusList: {}", statusList);
     final List<PostStatus> statusEnumList =
-        Arrays.stream(statusList.split(",")).map(this::convertToEnum).toList();
+        Arrays.stream(statusList.split(",")).map(PostStatus::fromCode).toList();
+
     final List<Post> posts = postRepository.findPostsByStatus(currentUser.getId(), statusEnumList);
+    if (posts.isEmpty()) {
+      return List.of();
+    }
     final List<String> pickupLocationIds = posts.stream().map(Post::getPickupLocationId).toList();
     final List<String> dropLocationIds = posts.stream().map(Post::getDropLocationId).toList();
     final List<String> postIds = posts.stream().map(Post::getId).toList();
@@ -267,14 +271,6 @@ public class PostService {
         .toList();
   }
 
-  private PostStatus convertToEnum(final String status) {
-    try {
-      return PostStatus.valueOf(status);
-    } catch (IllegalArgumentException e) {
-      throw new AppException(ErrorCode.INVALID_POST_STATUS);
-    }
-  }
-
   public void update(final String postId, final Post update) {
     final Post origin = postRepository.findById(postId).get();
     if (update.getStatus() != null) {
@@ -285,5 +281,41 @@ public class PostService {
 
   public PostStatus findPostStatusByPostId(final String postId) {
     return postRepository.findPostStatusByPostId(postId);
+  }
+
+  public void updatePostStatus(
+      final String newStatus, final String postId, final String photo, final String description) {
+    final Post post = this.findById(postId);
+    final PostStatus newPostStatus = PostStatus.fromCode(newStatus);
+    final PostHistoryStatus newPostHistoryStatus = PostHistoryStatus.fromCode(newStatus);
+    final PostStatus oldPostStatus = post.getStatus();
+    if (newPostStatus == oldPostStatus) return;
+    final PostHistory postHistory =
+        PostHistory.builder()
+            .post(post)
+            .status(newPostHistoryStatus)
+            .description(description != null ? description : newPostHistoryStatus.getDescription())
+            .statusChangeDate(LocalDateTime.now())
+            .build();
+    // FIXME Call external api service to store img
+    //    if (photo != null) {
+    //      postHistory.setPhoto(cloudinaryService.url(photo));
+    //    }
+    postHistoryRepository.save(postHistory);
+    if (newPostStatus.equals(PostStatus.PICKED_UP)) {
+      post.setPickupDatetime(LocalDateTime.now());
+    } else if (newPostStatus.equals(PostStatus.DELIVERED)) {
+      post.setDropDateTime(LocalDateTime.now());
+    }
+    post.setStatus(newPostStatus);
+
+    kafkaTemplate.send(
+        "ws.post.status.update",
+        UpdatePostStatusRequestEvent.builder()
+            .postMessageType(PostMessageType.valueOf(newPostStatus.name()))
+            .postId(postId)
+            .build());
+
+    postRepository.save(post);
   }
 }

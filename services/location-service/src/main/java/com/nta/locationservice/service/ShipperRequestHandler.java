@@ -79,17 +79,17 @@ public class ShipperRequestHandler {
 
   private void handlePostTimeout(final String postId) {
     try {
-      postClient.updatePost(postId, Post.builder().status(PostStatus.TIMED_OUT).build());
+      postClient.updatePost(postId, Post.builder().status(PostStatus.SEARCH_TIMEOUT).build());
       postClient.addPostHistory(
           PostHistoryCreationRequest.builder()
               .postId(postId)
-              .status(PostHistoryStatus.TIME_OUT)
+              .status(PostHistoryStatus.SEARCH_TIMEOUT)
               .build());
       kafkaTemplate.send(
           "finding-shipper-request-time-out",
           NotFoundShipperEvent.builder()
               .postId(postId)
-              .postMessageType(PostMessageType.NOT_FOUND_SHIPPER)
+              .postMessageType(PostMessageType.SEARCH_TIMEOUT)
               .build());
     } catch (Exception e) {
       log.error("Error while changing status of post", e);
@@ -164,10 +164,12 @@ public class ShipperRequestHandler {
             .postMessageType(PostMessageType.DELIVERY_REQUEST)
             .postResponse(message.getPostResponse())
             .build());
+    postClient.updatePost(
+        message.getPostId(), Post.builder().status(PostStatus.SHIPPER_FOUND).build());
     postClient.addPostHistory(
         PostHistoryCreationRequest.builder()
             .postId(message.getPostId())
-            .status(PostHistoryStatus.INVITED)
+            .status(PostHistoryStatus.SHIPPER_INVITED)
             .description("SHIPPER-" + candidateShipper + "was invited to take this order")
             .build());
     postClient.addShipperPost(
