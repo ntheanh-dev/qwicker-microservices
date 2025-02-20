@@ -36,4 +36,8 @@ public class ShipperPostService {
         .getLastShipperPostByPostId(postId)
         .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND));
   }
+
+  public boolean isShipperPostExist(final String postId, final String shipperId) {
+    return shipperPostRepository.existsByPostIdAndShipper(postId, shipperId);
+  }
 }

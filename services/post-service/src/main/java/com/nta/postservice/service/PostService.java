@@ -127,17 +127,19 @@ public class PostService {
     postResponse.setPayment(payment);
     postResponse.setPickupLocation(pickupLocation);
     postResponse.setDropLocation(dropLocation);
-    kafkaTemplate.send(
-        "find-nearest-shipper",
-        FindNearestShipperEvent.builder()
-            .postId(post.getId())
-            .latitude(pickupLocation.getLatitude())
-            .longitude(pickupLocation.getLongitude())
-            .vehicleId(request.getOrder().getVehicleId())
-            .timestamp(LocalDateTime.now())
-            .km(5)
-            .postResponse(objectMapper.writeValueAsString(postResponse))
-            .build());
+    if (post.getStatus() != PostStatus.WAITING_PAY) {
+      kafkaTemplate.send(
+          "find-nearest-shipper",
+          FindNearestShipperEvent.builder()
+              .postId(post.getId())
+              .latitude(pickupLocation.getLatitude())
+              .longitude(pickupLocation.getLongitude())
+              .vehicleId(request.getOrder().getVehicleId())
+              .timestamp(LocalDateTime.now())
+              .km(5)
+              .postResponse(objectMapper.writeValueAsString(postResponse))
+              .build());
+    }
     return post;
   }
 
@@ -231,7 +233,6 @@ public class PostService {
     if (statusList == null || statusList.isEmpty()) {
       return postMapper.toPostResponseList(postRepository.findPostsByUserId(currentUser.getId()));
     }
-    log.info("statusList: {}", statusList);
     final List<PostStatus> statusEnumList =
         Arrays.stream(statusList.split(",")).map(PostStatus::fromCode).toList();
 

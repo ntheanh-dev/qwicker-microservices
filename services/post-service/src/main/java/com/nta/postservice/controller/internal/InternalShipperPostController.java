@@ -26,4 +26,12 @@ public class InternalShipperPostController {
         .result(shipperPostService.getLastShipperPostByPostId(postId))
         .build();
   }
+
+  @GetMapping("")
+  ApiResponse<Boolean> isExistByShipperIdAndPostId(
+      @RequestParam String shipperId, @RequestParam String postId) {
+    return ApiResponse.<Boolean>builder()
+        .result(shipperPostService.isShipperPostExist(shipperId, postId))
+        .build();
+  }
 }

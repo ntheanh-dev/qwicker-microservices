@@ -13,3 +13,7 @@ spring:
     hibernate:
       ddl-auto: create
     show-sql: true
+
+application:
+  config:
+    post-url: http://localhost:8085/post
