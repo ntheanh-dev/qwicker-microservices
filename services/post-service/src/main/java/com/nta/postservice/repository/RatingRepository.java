@@ -14,4 +14,6 @@ public interface RatingRepository extends JpaRepository<Rating, RatingId> {
 
   @Query("SELECT COALESCE(AVG(r.rating), 0) FROM Rating r WHERE r.shipperId = :shipperId")
   Double findAverageRatingByShipperId(@Param("shipperId") String shipperId);
+
+  Rating findByRaterIdAndPostId(String raterId, String postId);
 }

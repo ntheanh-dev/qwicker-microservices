@@ -23,6 +23,7 @@ public enum ErrorCode {
   RATING_NOT_FOUND(1017, "Rating not found", HttpStatus.NOT_FOUND),
   CANNOT_UPDATE_POST_STATUS(1018, "Cannot update post status", HttpStatus.BAD_REQUEST),
   INVALID_POST_HISTORY_STATUS(1019, "Invalid post history status", HttpStatus.BAD_REQUEST),
+  POST_NOT_VALID_TO_RATING(1020, "Post not valid to rating", HttpStatus.BAD_REQUEST),
   ;
 
   private final int code;
