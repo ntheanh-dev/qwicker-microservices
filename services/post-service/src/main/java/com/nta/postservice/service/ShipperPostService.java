@@ -14,6 +14,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +23,7 @@ public class ShipperPostService {
     ShipperPostRepository shipperPostRepository;
     PostService postService;
     ProfileClient profileClient;
+    AuthenticationService authenticationService;
 
     public void add(final String postId, final String shipperId) {
         final Post post = postService.findById(postId);
@@ -49,5 +51,11 @@ public class ShipperPostService {
         final ShipperPostStatus status = ShipperPostStatus.fromCode(shipperPostStatus);
         final String acceptedShipperId = shipperPostRepository.findByPostIdAndStatus(postId, status).getFirst().getShipper();
         return profileClient.getShipperProfileByAccountId(acceptedShipperId).getResult();
+    }
+
+    public List<String> findPostIdsByDateRange(
+            final String type) {
+        final String shipperId = authenticationService.getUserDetail().getId();
+        return shipperPostRepository.findPostIdsByShipper(shipperId, ShipperPostStatus.fromCode(type));
     }
 }
