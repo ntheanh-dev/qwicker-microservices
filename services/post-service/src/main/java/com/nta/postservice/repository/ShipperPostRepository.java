@@ -31,8 +31,8 @@ public interface ShipperPostRepository extends JpaRepository<ShipperPost, Shippe
                                                  @Param("endDate") LocalDateTime endDate,
                                                  @Param("status") ShipperPostStatus status);
 
-    @Query("SELECT sp.post.id FROM ShipperPost sp where sp.status = :status AND sp.shipper =: shipper")
-    List<String> findPostIdsByShipper(@Param("shipper") final String shipper,
-                                      @Param("status") ShipperPostStatus status
-    );
+    @Query("SELECT sp.post.id FROM ShipperPost sp WHERE sp.status = :status AND sp.shipper = :shipper")
+    List<String> findPostIdsByShipper(@Param("shipper") String shipper,
+                                      @Param("status") ShipperPostStatus status);
+
 }

@@ -1,4 +1,4 @@
-package com.nta.paymentservice.controller.internal;
+package com.nta.paymentservice.controller;
 
 import com.nta.paymentservice.dto.response.ApiResponse;
 import com.nta.paymentservice.dto.response.StatisticIncomeResponse;

@@ -65,4 +65,6 @@ public interface PaymentRepository extends JpaRepository<Payment, String> {
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate,
             @Param("postIds") List<String> postIds);
+
+    boolean existsByPostId(String postId);
 }
