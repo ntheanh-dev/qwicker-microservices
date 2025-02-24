@@ -4,10 +4,9 @@ import com.nta.postservice.dto.request.internal.ShipperPostCreationRequest;
 import com.nta.postservice.dto.response.ApiResponse;
 import com.nta.postservice.entity.ShipperPost;
 import com.nta.postservice.service.ShipperPostService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/internal/shipper-post")
@@ -33,7 +32,7 @@ public class InternalShipperPostController {
     ApiResponse<Boolean> isExistByShipperIdAndPostId(
             @RequestParam String shipperId, @RequestParam String postId) {
         return ApiResponse.<Boolean>builder()
-                .result(shipperPostService.isShipperPostExist(shipperId, postId))
+                .result(shipperPostService.isShipperPostExist(postId, shipperId))
                 .build();
     }
 

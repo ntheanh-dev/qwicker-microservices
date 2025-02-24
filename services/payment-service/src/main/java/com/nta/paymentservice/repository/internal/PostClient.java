@@ -9,11 +9,10 @@ import java.util.List;
 
 @FeignClient(name = "post-service", url = "${application.config.post-url}")
 public interface PostClient {
-    @GetMapping("/internal/shipper-post/")
-    ApiResponse<Boolean> isExistByShipperIdAndPostId(
-            @RequestParam String shipperId, @RequestParam String postId);
+  @GetMapping("/internal/shipper-post")
+  ApiResponse<Boolean> isExistByShipperIdAndPostId(
+      @RequestParam String shipperId, @RequestParam String postId);
 
-    @GetMapping("/internal/shipper-post/filter")
-    ApiResponse<List<String>> getAcceptedPostsByDateRange(
-            @RequestParam("status") String type);
+  @GetMapping("/internal/shipper-post/filter")
+  ApiResponse<List<String>> getAcceptedPostsByDateRange(@RequestParam("status") String type);
 }

@@ -18,23 +18,22 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/payments")
 @Slf4j
 public class PaymentController {
-    PaymentService paymentService;
-    AuthenticationService authenticationService;
+  PaymentService paymentService;
+  AuthenticationService authenticationService;
 
-    @PreAuthorize("hasRole('SHIPPER')")
-    @PostMapping("/collect-cash")
-    ApiResponse<?> collectCash(@RequestParam(value = "postId", required = true) String postId) {
-        final String shipperId = authenticationService.getUserDetail().getId();
-        paymentService.collectCash(shipperId, postId);
-        return ApiResponse.builder().build();
-    }
+  @PreAuthorize("hasRole('SHIPPER')")
+  @PostMapping("/posts/{postId}/collect-cash")
+  ApiResponse<?> collectCash(@PathVariable String postId) {
+    final String shipperId = authenticationService.getUserDetail().getId();
+    paymentService.collectCash(postId, shipperId);
+    return ApiResponse.builder().build();
+  }
 
-    @GetMapping("/vn-pay")
-    public ApiResponse<VNPayResponse> pay(
-            final HttpServletRequest request) { // use HttpServletRequest for getting client ip
-        return ApiResponse.<VNPayResponse>builder()
-                .result(paymentService.createVnPayPayment(request))
-                .build();
-    }
-
+  @GetMapping("/vn-pay")
+  public ApiResponse<VNPayResponse> pay(
+      final HttpServletRequest request) { // use HttpServletRequest for getting client ip
+    return ApiResponse.<VNPayResponse>builder()
+        .result(paymentService.createVnPayPayment(request))
+        .build();
+  }
 }

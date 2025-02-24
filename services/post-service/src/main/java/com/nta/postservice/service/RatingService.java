@@ -79,6 +79,7 @@ public class RatingService {
   public RatingResponse getRatingByPostId(final String postId) {
     final String raterId = authenticationService.getUserDetail().getId();
     final Rating rating = ratingRepository.findByRaterIdAndPostId(raterId, postId);
+    if (rating == null) return null;
     return RatingResponse.builder()
         .rating(rating.getRating())
         .feedback(rating.getFeedback())

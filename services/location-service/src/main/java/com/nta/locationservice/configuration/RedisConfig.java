@@ -27,10 +27,9 @@ public class RedisConfig {
         new RedisStandaloneConfiguration(REDIS_HOST, Integer.parseInt(REDIS_PORT));
 
     JedisPoolConfig poolConfig = new JedisPoolConfig();
-    poolConfig.setMaxTotal(100); // Số lượng tối đa connection trong pool
+    poolConfig.setMaxTotal(512); // Số lượng tối đa connection trong pool
     poolConfig.setMaxIdle(50); // Connection tối đa có thể idle
     poolConfig.setMinIdle(20); // Connection tối thiểu idle
-
     JedisClientConfiguration jedisClientConfiguration =
         JedisClientConfiguration.builder().usePooling().poolConfig(poolConfig).build();
 

@@ -8,13 +8,12 @@ import com.nta.postservice.enums.ShipperPostStatus;
 import com.nta.postservice.exception.AppException;
 import com.nta.postservice.repository.ShipperPostRepository;
 import com.nta.postservice.repository.httpClient.ProfileClient;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -44,7 +43,7 @@ public class ShipperPostService {
     }
 
     public boolean isShipperPostExist(final String postId, final String shipperId) {
-        return shipperPostRepository.existsByPostIdAndShipper(postId, shipperId);
+        return shipperPostRepository.existsByPost_IdAndShipper(postId, shipperId);
     }
 
     public ShipperProfileResponse getShipperProfileByPostId(final String postId, final String shipperPostStatus) {
