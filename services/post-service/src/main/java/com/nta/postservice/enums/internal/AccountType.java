@@ -1,4 +1,4 @@
-package com.nta.identity.enums;
+package com.nta.postservice.enums.internal;
 
 import lombok.Getter;
 

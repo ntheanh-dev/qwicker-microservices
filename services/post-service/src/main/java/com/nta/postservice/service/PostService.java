@@ -13,6 +13,7 @@ import com.nta.postservice.dto.response.PostResponse;
 import com.nta.postservice.dto.response.internal.*;
 import com.nta.postservice.entity.*;
 import com.nta.postservice.enums.*;
+import com.nta.postservice.enums.internal.AccountType;
 import com.nta.postservice.exception.AppException;
 import com.nta.postservice.mapper.PostMapper;
 import com.nta.postservice.mapper.ProductMapper;
@@ -23,6 +24,7 @@ import com.nta.postservice.repository.httpClient.PaymentClient;
 import com.nta.postservice.repository.httpClient.ProfileClient;
 import feign.FeignException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -236,10 +238,19 @@ public class PostService {
     final List<PostStatus> statusEnumList =
         Arrays.stream(statusList.split(",")).map(PostStatus::fromCode).toList();
 
-    final List<Post> posts = postRepository.findPostsByStatus(currentUser.getId(), statusEnumList);
+    List<Post> posts = new ArrayList<>();
+    if (currentUser.getAccountType().equals(AccountType.USER)) {
+      posts = postRepository.findPostsByUserIdAndStatus(currentUser.getId(), statusEnumList);
+    } else if (currentUser.getAccountType().equals(AccountType.SHIPPER)) {
+      posts =
+          shipperPostRepository.findPostsByShipperIdAndStatus(currentUser.getId(), statusEnumList);
+    }
+
     if (posts.isEmpty()) {
+      log.warn("No posts found for user id {}", currentUser.getId());
       return List.of();
     }
+
     final List<String> pickupLocationIds = posts.stream().map(Post::getPickupLocationId).toList();
     final List<String> dropLocationIds = posts.stream().map(Post::getDropLocationId).toList();
     final List<String> postIds = posts.stream().map(Post::getId).toList();
