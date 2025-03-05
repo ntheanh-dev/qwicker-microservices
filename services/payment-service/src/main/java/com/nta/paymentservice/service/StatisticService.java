@@ -1,17 +1,21 @@
 package com.nta.paymentservice.service;
 
+import com.nta.paymentservice.components.DateUtils;
 import com.nta.paymentservice.dto.response.StatisticIncomeResponse;
 import com.nta.paymentservice.enums.StatisticIncomeType;
 import com.nta.paymentservice.repository.PaymentRepository;
 import com.nta.paymentservice.repository.internal.PostClient;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -25,23 +29,67 @@ public class StatisticService {
     AuthenticationService authenticationService;
     PostClient postClient;
     PaymentRepository paymentRepository;
+    DateUtils dateUtils;
 
     @PreAuthorize("hasRole('SHIPPER')")
-    public List<StatisticIncomeResponse> getStatistics(final LocalDateTime startDate, final LocalDateTime endDate, final String t) {
+    public List<StatisticIncomeResponse> getStatistics(
+            final String startDate, final String endDate, final String t) throws ParseException {
         final StatisticIncomeType type = StatisticIncomeType.fromCode(t);
-
+        final LocalDateTime from = dateUtils.parseDateTime(startDate);
+        final LocalDateTime to = dateUtils.parseDateTime(endDate);
         final var shipperId = authenticationService.getUserDetail().getId();
         final List<StatisticIncomeResponse> response = new ArrayList<>();
-        final List<String> postId = postClient.getAcceptedPostsByDateRange("ACCEPTED").getResult();
-        if (postId.isEmpty()) {
-            return response;
-        }
 
         List<Object[]> results = null;
         switch (type) {
-            case HOURLY -> results = paymentRepository.findHourlyIncome(startDate, endDate, postId);
-            case DAILY -> results = paymentRepository.findDailyIncome(startDate, endDate, postId);
-            case MONTHLY -> results = paymentRepository.findMonthlyIncome(startDate, endDate, postId);
+            case HOURLY -> {
+                final List<String> postId =
+                        postClient
+                                .getAcceptedPostsByDateRange(
+                                        "ACCEPTED",
+                                        StatisticIncomeType.HOURLY.toString(),
+                                        shipperId,
+                                        startDate,
+                                        endDate)
+                                .getResult();
+                if (postId.isEmpty()) {
+                    log.info("No posts found for start date: {}, end date: {}", startDate, endDate);
+                    return response;
+                }
+                results = paymentRepository.findHourlyIncome(from, to, postId);
+            }
+            case DAILY -> {
+                final List<String> postId =
+                        postClient
+                                .getAcceptedPostsByDateRange(
+                                        "ACCEPTED",
+                                        StatisticIncomeType.DAILY.toString(),
+                                        shipperId,
+                                        startDate,
+                                        endDate)
+                                .getResult();
+                if (postId.isEmpty()) {
+                    log.info("No posts found for start date: {}, end date: {}", startDate, endDate);
+                    return response;
+                }
+                results = paymentRepository.findDailyIncome(from, to, postId);
+            }
+            case MONTHLY -> {
+                final List<String> postId =
+                        postClient
+                                .getAcceptedPostsByDateRange(
+                                        "ACCEPTED",
+                                        StatisticIncomeType.MONTHLY.toString(),
+                                        shipperId,
+                                        startDate,
+                                        endDate)
+                                .getResult();
+                if (postId.isEmpty()) {
+                    log.info("No posts found for start date: {}, end date: {}", startDate, endDate);
+                    return response;
+                }
+                results = paymentRepository.findMonthlyIncome(from, to, postId);
+            }
             default -> {
                 log.error("Unsupported time type: {}", type);
                 return List.of();
@@ -60,8 +108,11 @@ public class StatisticService {
         LocalDateTime dateTime = null;
         switch (type) {
             case HOURLY -> dateTime = LocalDateTime.parse(result[0].toString(), formatter);
-            case DAILY -> dateTime = LocalDateTime.parse(result[0].toString() + " 00:00:00", formatter);
-            case MONTHLY -> dateTime = LocalDateTime.parse(result[0].toString() + "-01 00:00:00", formatter);
+            case DAILY ->
+                    dateTime = LocalDateTime.parse(result[0].toString() + " 00:00:00", formatter);
+            case MONTHLY ->
+                    dateTime =
+                            LocalDateTime.parse(result[0].toString() + "-01 00:00:00", formatter);
         }
         return StatisticIncomeResponse.builder()
                 .type(type)

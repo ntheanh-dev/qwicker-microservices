@@ -2,6 +2,7 @@ package com.nta.postservice.dto.request;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -11,10 +12,10 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RatingCreationRequest {
-  @Min(value = 0, message = "Rating must be at least 0")
-  @Max(value = 5, message = "Rating must not exceed 5")
-  double rating;
+    @Min(value = 0, message = "Rating must be at least 0")
+    @Max(value = 5, message = "Rating must not exceed 5")
+    double rating;
 
-  String feedback;
-  String postId;
+    String feedback;
+    String postId;
 }

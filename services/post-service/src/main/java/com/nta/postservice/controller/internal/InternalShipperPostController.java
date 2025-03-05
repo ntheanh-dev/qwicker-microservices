@@ -1,12 +1,16 @@
 package com.nta.postservice.controller.internal;
 
+import java.text.ParseException;
+import java.util.List;
+
+import org.springframework.web.bind.annotation.*;
+
 import com.nta.postservice.dto.request.internal.ShipperPostCreationRequest;
 import com.nta.postservice.dto.response.ApiResponse;
 import com.nta.postservice.entity.ShipperPost;
 import com.nta.postservice.service.ShipperPostService;
-import java.util.List;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/internal/shipper-post")
@@ -29,8 +33,7 @@ public class InternalShipperPostController {
     }
 
     @GetMapping("")
-    ApiResponse<Boolean> isExistByShipperIdAndPostId(
-            @RequestParam String shipperId, @RequestParam String postId) {
+    ApiResponse<Boolean> isExistByShipperIdAndPostId(@RequestParam String shipperId, @RequestParam String postId) {
         return ApiResponse.<Boolean>builder()
                 .result(shipperPostService.isShipperPostExist(postId, shipperId))
                 .build();
@@ -38,9 +41,14 @@ public class InternalShipperPostController {
 
     @GetMapping("/filter")
     ApiResponse<List<String>> getAcceptedPostsByShipperId(
-            @RequestParam("status") String status) {
+            @RequestParam("status") String type,
+            @RequestParam("timeType") String timeType,
+            @RequestParam("shipperId") String shipperId,
+            @RequestParam("fromDate") String fromDate,
+            @RequestParam("endDate") String endDate)
+            throws ParseException {
         return ApiResponse.<List<String>>builder()
-                .result(shipperPostService.findPostIdsByDateRange(status))
+                .result(shipperPostService.findPostIdsByDateRange(type, timeType, shipperId, fromDate, endDate))
                 .build();
     }
 }

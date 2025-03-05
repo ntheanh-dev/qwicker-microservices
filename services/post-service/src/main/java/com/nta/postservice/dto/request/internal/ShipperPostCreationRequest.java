@@ -4,6 +4,6 @@ import lombok.Getter;
 
 @Getter
 public class ShipperPostCreationRequest {
-  private String postId;
-  private String shipperId;
+    private String postId;
+    private String shipperId;
 }

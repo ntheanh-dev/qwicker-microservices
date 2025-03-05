@@ -1,11 +1,13 @@
 package com.nta.postservice.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
 
-import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
+import lombok.*;
 
 @Entity
 @Setter
@@ -29,8 +31,10 @@ public class Rating {
 
     @NotNull
     double rating;
+
     @NotNull
     String feedback;
+
     LocalDateTime createdAt;
 
     @JsonBackReference

@@ -1,5 +1,11 @@
 package com.nta.postservice.controller;
 
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.nta.postservice.dto.request.PostCreationRequest;
 import com.nta.postservice.dto.request.UpdatePostStatusRequest;
@@ -9,14 +15,10 @@ import com.nta.postservice.dto.response.internal.ShipperProfileResponse;
 import com.nta.postservice.entity.Post;
 import com.nta.postservice.service.PostService;
 import com.nta.postservice.service.ShipperPostService;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/posts")
@@ -35,13 +37,17 @@ public class PostController {
 
     @GetMapping("/{id}")
     ApiResponse<PostResponse> findById(@RequestParam Map<String, String> params, @PathVariable String id) {
-        return ApiResponse.<PostResponse>builder().result(postService.findById(params, id)).build();
+        return ApiResponse.<PostResponse>builder()
+                .result(postService.findById(params, id))
+                .build();
     }
 
     @GetMapping("/{id}/shippers")
     ApiResponse<ShipperProfileResponse> getShippersByPost(@RequestParam String status, @PathVariable String id) {
 
-        return ApiResponse.<ShipperProfileResponse>builder().result(shipperPostService.getShipperProfileByPostId(id, status)).build();
+        return ApiResponse.<ShipperProfileResponse>builder()
+                .result(shipperPostService.getShipperProfileByPostId(id, status))
+                .build();
     }
 
     @PostMapping("/{id}/shipment-accept")
@@ -52,7 +58,8 @@ public class PostController {
     }
 
     @GetMapping
-    ApiResponse<List<PostResponse>> getAllUserPosts(@RequestParam(value = "status", required = false) String statusList) {
+    ApiResponse<List<PostResponse>> getAllUserPosts(
+            @RequestParam(value = "status", required = false) String statusList) {
         List<PostResponse> response;
         try {
             response = postService.getPostsByStatusList(statusList);

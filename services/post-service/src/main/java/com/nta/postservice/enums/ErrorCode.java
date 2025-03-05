@@ -1,8 +1,9 @@
 package com.nta.postservice.enums;
 
-import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+
+import lombok.Getter;
 
 @Getter
 public enum ErrorCode {
@@ -17,8 +18,7 @@ public enum ErrorCode {
     VEHICLE_NOT_FOUND(1012, "Vehicle not found", HttpStatus.BAD_REQUEST),
     JOINED_POST_BEFORE(1013, "Joined post before", HttpStatus.BAD_REQUEST),
     OBJECT_NOT_FOUND(1014, "Object not found", HttpStatus.BAD_REQUEST),
-    POST_TAKEN_BY_ANOTHER_SHIPPER(
-            1015, "The post has already been taken by another shipper", HttpStatus.BAD_REQUEST),
+    POST_TAKEN_BY_ANOTHER_SHIPPER(1015, "The post has already been taken by another shipper", HttpStatus.BAD_REQUEST),
     SHIPPER_POST_NOT_FOUND(1016, "Shipper post not found", HttpStatus.NOT_FOUND),
     RATING_NOT_FOUND(1017, "Rating not found", HttpStatus.NOT_FOUND),
     CANNOT_UPDATE_POST_STATUS(1018, "Cannot update post status", HttpStatus.BAD_REQUEST),

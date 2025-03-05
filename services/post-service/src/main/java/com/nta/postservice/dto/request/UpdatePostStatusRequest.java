@@ -9,7 +9,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
 public class UpdatePostStatusRequest {
-  String status;
-  String description;
-  String photo;
+    String status;
+    String description;
+    String photo;
 }
