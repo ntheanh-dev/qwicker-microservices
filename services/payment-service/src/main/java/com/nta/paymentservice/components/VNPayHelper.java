@@ -1,24 +1,28 @@
 package com.nta.paymentservice.components;
 
 import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
 @Component
 public class VNPayHelper {
-    @Value("${server.address:localhost}")  // Mặc định là localhost nếu không được cấu hình
+    @Value("${server.address:localhost}") // Mặc định là localhost nếu không được cấu hình
     private String address;
+
     @Value("${server.servlet.context-path}")
     private String contextPath;
-    @Value("${server.port:8080}")  // Mặc định là 8080 nếu không được cấu hình
+
+    @Value("${server.port:8080}") // Mặc định là 8080 nếu không được cấu hình
     private int port;
 
     public String hmacSHA512(final String key, final String data) {
@@ -70,14 +74,16 @@ public class VNPayHelper {
                 .map(
                         entry ->
                                 (encodeKey
-                                        ? URLEncoder.encode(entry.getKey(), StandardCharsets.US_ASCII)
-                                        : entry.getKey())
+                                                ? URLEncoder.encode(
+                                                        entry.getKey(), StandardCharsets.US_ASCII)
+                                                : entry.getKey())
                                         + "="
-                                        + URLEncoder.encode(entry.getValue(), StandardCharsets.US_ASCII))
+                                        + URLEncoder.encode(
+                                                entry.getValue(), StandardCharsets.US_ASCII))
                 .collect(Collectors.joining("&"));
     }
 
     public String getPaymentReturnURL() {
-        return "http:" + address + ":" + port + contextPath + "/payment/vn-pay-callback";
+        return "http:" + address + ":" + "8888" + "/api/v3/payment/" + "payments/vn-pay-callback";
     }
 }

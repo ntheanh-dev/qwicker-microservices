@@ -5,6 +5,8 @@ import com.nta.paymentservice.dto.response.ApiResponse;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -25,4 +27,7 @@ public interface PostClient {
             @RequestParam("shipperId") String shipperId,
             @RequestParam("fromDate") String fromDate,
             @RequestParam("endDate") String endDate);
+
+    @PostMapping("/internal/posts/{id}/vn-pay-success")
+    ApiResponse<?> vnPaySuccess(@PathVariable(name = "id") String postId);
 }

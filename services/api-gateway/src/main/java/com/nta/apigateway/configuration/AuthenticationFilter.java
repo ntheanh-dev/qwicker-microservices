@@ -1,7 +1,15 @@
 package com.nta.apigateway.configuration;
 
-import java.util.Arrays;
-import java.util.List;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nta.apigateway.dto.response.ApiResponse;
+import com.nta.apigateway.service.IdentityService;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -16,17 +24,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ServerWebExchange;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nta.apigateway.dto.response.ApiResponse;
-import com.nta.apigateway.service.IdentityService;
-
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
-import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -41,14 +42,16 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     private String apiPrefix;
 
     @NonFinal
-    private String[] PUBLIC_ENDPOINTS = new String[] {
-        "/identity/auth/.*",
-        "/identity/accounts/registration",
-        "/identity/accounts/check-username-exists",
-        "/identity/accounts/check-email-exists",
-        "/post/vehicles",
-        "/post/product-category",
-    };
+    private String[] PUBLIC_ENDPOINTS =
+            new String[] {
+                "/identity/auth/.*",
+                "/identity/accounts/registration",
+                "/identity/accounts/check-username-exists",
+                "/identity/accounts/check-email-exists",
+                "/post/vehicles",
+                "/post/product-category",
+                "/payment/payments/vn-pay-callback"
+            };
 
     @Override
     public Mono<Void> filter(final ServerWebExchange exchange, final GatewayFilterChain chain) {
@@ -64,15 +67,17 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
         final String token = authHeader.getFirst().replace("Bearer ", "");
         return identityService
                 .introspect(token)
-                .flatMap(introspectResponseApiResponse -> {
-                    if (introspectResponseApiResponse.getResult().isValid()) {
-                        return chain.filter(exchange);
-                    } else {
-                        log.info("invalid token");
-                        return unauthenticated(exchange.getResponse());
-                    }
-                })
-                .onErrorResume(throwable -> unauthenticated(exchange.getResponse())); // loi 500, 502...
+                .flatMap(
+                        introspectResponseApiResponse -> {
+                            if (introspectResponseApiResponse.getResult().isValid()) {
+                                return chain.filter(exchange);
+                            } else {
+                                log.info("invalid token");
+                                return unauthenticated(exchange.getResponse());
+                            }
+                        })
+                .onErrorResume(
+                        throwable -> unauthenticated(exchange.getResponse())); // loi 500, 502...
     }
 
     @Override

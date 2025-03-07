@@ -1,6 +1,7 @@
 package com.nta.paymentservice.enums;
 
 import lombok.Getter;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 
@@ -11,6 +12,7 @@ public enum ErrorCode {
   UNAUTHENTICATED(1006, "Unauthenticated", HttpStatus.UNAUTHORIZED),
   UNAUTHORIZED(1007, "You do not have permission", HttpStatus.FORBIDDEN),
   PAYMENT_NOT_FOUND(1008, "Payment not found", HttpStatus.NOT_FOUND),
+  INVALID_VNPAY_STATUS_CODE(1352, "Invalid vnpay status code", HttpStatus.BAD_REQUEST),
   ;
 
   ErrorCode(int code, String message, HttpStatusCode statusCode) {

@@ -20,9 +20,9 @@ application:
   payment:
     vnPay:
       url: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
-      tmnCode: ""
-      secretKey: ""
-      returnUrl: "http://${backend:localhost}}:8080/api/v1/payment/vn-pay-callback"
+      tmnCode: "ZDDQNEDU"
+      secretKey: "FAONAXJYWAKCGIDJDSKFGHIWDRCJQAET"
+      returnUrl: "http://${backend:localhost}}:8888/api/v3/payment/payments/vn-pay-callback"
       version: "2.1.0"
       command: "pay"
       orderType: "other"
