@@ -16,9 +16,11 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private static final String[] PUBLIC_ENDPOINTS = {
+    private static final String[] PUBLIC_POST_ENDPOINTS = {
         "/internal/delivery-locations/find-by-id-list"
     };
+
+    private static final String[] PUBLIC_GET_ENDPOINTS = {"/distance"};
 
     private final CustomJwtDecoder customJwtDecoder;
 
@@ -30,7 +32,9 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeHttpRequests(
                 request ->
-                        request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS)
+                        request.requestMatchers(HttpMethod.POST, PUBLIC_POST_ENDPOINTS)
+                                .permitAll()
+                                .requestMatchers(HttpMethod.GET, PUBLIC_GET_ENDPOINTS)
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated());

@@ -50,7 +50,8 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
                 "/identity/accounts/check-email-exists",
                 "/post/vehicles",
                 "/post/product-category",
-                "/payment/payments/vn-pay-callback"
+                "/payment/payments/vn-pay-callback",
+                "/location/distance"
             };
 
     @Override

@@ -4,6 +4,8 @@ server:
     context-path: /payment
 
 spring:
+  application:
+    name: payment-service
   datasource:
     url: "jdbc:mysql://localhost:3306/payment"
     driverClassName: "com.mysql.cj.jdbc.Driver"

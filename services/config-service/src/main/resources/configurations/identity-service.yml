@@ -4,6 +4,8 @@ server:
     context-path: /identity
 
 spring:
+  application:
+    name: identity-service
   servlet:
     multipart:
       max-file-size: 20MB

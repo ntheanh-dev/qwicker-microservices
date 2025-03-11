@@ -7,3 +7,7 @@ cloudinary:
   name: <>
   key: <>
   secret: <>
+
+spring:
+  application:
+    name: file-service

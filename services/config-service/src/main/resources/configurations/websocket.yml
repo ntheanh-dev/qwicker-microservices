@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: websocket
   kafka:
     bootstrap-servers: "${kafka:localhost}:9094"
     producer:

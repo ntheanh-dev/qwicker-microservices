@@ -4,6 +4,8 @@ server:
     context-path: /notification
 
 spring:
+  application:
+    name: notification-service
   data:
     mongodb:
       username: root

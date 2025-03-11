@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: post-service
   datasource:
     url: "jdbc:mysql://${mysqldb:localhost}:3306/post"
     driverClassName: com.mysql.cj.jdbc.Driver

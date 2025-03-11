@@ -25,6 +25,17 @@ spring:
     redis:
       host: "${redis:localhost}"
       port: 6380
+  spring:
+    cloud:
+      circuitbreaker:
+        enabled: true
+
+        circuitBreaker:
+          greetingService:
+            threshold: 3
+            timeout: 1000  # Timeout in milliseconds
+            failureRateThreshold: 0.5  # 50% failure rate threshold
+
 
 application:
   config:
