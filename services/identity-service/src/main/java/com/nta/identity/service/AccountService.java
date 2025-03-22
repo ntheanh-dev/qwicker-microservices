@@ -5,6 +5,7 @@ import com.nta.identity.constant.PredefinedRole;
 import com.nta.identity.dto.request.*;
 import com.nta.identity.dto.response.AccountResponse;
 import com.nta.identity.dto.response.DataExistResponse;
+import com.nta.identity.dto.response.NumAccountsResponse;
 import com.nta.identity.entity.Account;
 import com.nta.identity.entity.AccountStatus;
 import com.nta.identity.entity.Role;
@@ -16,19 +17,23 @@ import com.nta.identity.mapper.ProfileMapper;
 import com.nta.identity.repository.AccountRepository;
 import com.nta.identity.repository.RoleRepository;
 import com.nta.identity.repository.httpClient.ProfileClient;
+
 import jakarta.transaction.Transactional;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -46,7 +51,8 @@ public class AccountService {
 
     @Transactional
     public AccountResponse createAccount(final AccountCreationRequest request) {
-        if (accountRepository.existsByUsername(request.getUsername())) throw new AppException(ErrorCode.USER_EXISTED);
+        if (accountRepository.existsByUsername(request.getUsername()))
+            throw new AppException(ErrorCode.USER_EXISTED);
 
         Account account = accountMapper.toAccount(request);
         account.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -59,9 +65,11 @@ public class AccountService {
             account = accountRepository.save(account);
 
             log.info("Call profile-service to create a Profile");
-            final var shipperProfileRequest = profileMapper.toShipperProfileCreationRequest(request);
+            final var shipperProfileRequest =
+                    profileMapper.toShipperProfileCreationRequest(request);
             shipperProfileRequest.setAccountId(account.getId());
-            final var shipperProfileResponse = profileClient.createShipperProfile(shipperProfileRequest);
+            final var shipperProfileResponse =
+                    profileClient.createShipperProfile(shipperProfileRequest);
 
             log.info("Created shipper profile: {}", shipperProfileResponse);
         } else {
@@ -92,9 +100,12 @@ public class AccountService {
     //    }
 
     @PreAuthorize("hasRole('ADMIN')")
-    public AccountResponse updateAccount(final String accountId, final AccountUpdateRequest request) {
+    public AccountResponse updateAccount(
+            final String accountId, final AccountUpdateRequest request) {
         final Account account =
-                accountRepository.findById(accountId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+                accountRepository
+                        .findById(accountId)
+                        .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         accountMapper.updateAccount(account, request);
         account.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -111,8 +122,13 @@ public class AccountService {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    public List<AccountResponse> getAccounts() {
-        return accountRepository.findAll().stream()
+    public List<AccountResponse> getAccounts(final String accountType) {
+        if (accountType == null) {
+            return accountRepository.findAll().stream()
+                    .map(accountMapper::toAccountResponse)
+                    .toList();
+        }
+        return accountRepository.findByRole(accountType).stream()
                 .map(accountMapper::toAccountResponse)
                 .toList();
     }
@@ -120,7 +136,9 @@ public class AccountService {
     @PreAuthorize("hasRole('ADMIN')")
     public AccountResponse getAccount(final String id) {
         return accountMapper.toAccountResponse(
-                accountRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED)));
+                accountRepository
+                        .findById(id)
+                        .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED)));
     }
 
     public DataExistResponse checkIfUsernameExist(final CheckUsernameExistsRequest request) {
@@ -143,12 +161,13 @@ public class AccountService {
         redisService.set(request.getToEmail(), otp);
         redisService.setTimeToLive(request.getToEmail(), 3);
         // Call notification-service to sent otp to user
-        final NotificationEvent notificationEvent = NotificationEvent.builder()
-                .channel("EMAIL")
-                .recipient(request.getToEmail())
-                .templateCode("otpMailTemplate.ftl")
-                .param(Map.of("username", request.getUsername(), "otp", otp, "otpTTL", 3))
-                .build();
+        final NotificationEvent notificationEvent =
+                NotificationEvent.builder()
+                        .channel("EMAIL")
+                        .recipient(request.getToEmail())
+                        .templateCode("otpMailTemplate.ftl")
+                        .param(Map.of("username", request.getUsername(), "otp", otp, "otpTTL", 3))
+                        .build();
         kafkaTemplate.send("notification-sent-otp", notificationEvent);
     }
 
@@ -172,12 +191,27 @@ public class AccountService {
 
     public void changeStatusById(final String id, AccountStatus status) {
         final Account account =
-                accountRepository.findById(id).orElseThrow(() -> new RuntimeException("Account not found"));
+                accountRepository
+                        .findById(id)
+                        .orElseThrow(() -> new RuntimeException("Account not found"));
         account.setStatus(status);
         accountRepository.save(account);
     }
 
     public boolean isReadyForTakeOrder(final String accountId) {
         return accountRepository.isReadyForTakeOrder(accountId);
+    }
+
+    public NumAccountsResponse getNumAccounts() {
+        final long basicAccount = accountRepository.countByRole("USER");
+        final long shipperAccount = accountRepository.countByRole("SHIPPER");
+        return NumAccountsResponse.builder()
+                .basicUserAccount(basicAccount)
+                .shipperAccount(shipperAccount)
+                .build();
+    }
+
+    public List<Account> getAllAccounts(final String accountType) {
+        return accountRepository.findByRole(accountType);
     }
 }

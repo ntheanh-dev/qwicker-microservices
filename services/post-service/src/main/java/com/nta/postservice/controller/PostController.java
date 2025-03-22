@@ -1,15 +1,10 @@
 package com.nta.postservice.controller;
 
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.nta.postservice.dto.request.PostCreationRequest;
 import com.nta.postservice.dto.request.UpdatePostStatusRequest;
 import com.nta.postservice.dto.response.ApiResponse;
+import com.nta.postservice.dto.response.CountNumPostResponse;
 import com.nta.postservice.dto.response.PostResponse;
 import com.nta.postservice.dto.response.internal.ShipperProfileResponse;
 import com.nta.postservice.entity.Post;
@@ -19,6 +14,12 @@ import com.nta.postservice.service.ShipperPostService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/posts")
@@ -30,20 +31,21 @@ public class PostController {
     private final ShipperPostService shipperPostService;
 
     @PostMapping
-    ApiResponse<Post> createPost(@RequestBody PostCreationRequest request) throws JsonProcessingException {
+    ApiResponse<Post> createPost(@RequestBody PostCreationRequest request)
+            throws JsonProcessingException {
         var response = postService.createPost(request);
         return ApiResponse.<Post>builder().result(response).build();
     }
 
     @GetMapping("/{id}")
-    ApiResponse<PostResponse> findById(@RequestParam Map<String, String> params, @PathVariable String id) {
-        return ApiResponse.<PostResponse>builder()
-                .result(postService.findById(params, id))
-                .build();
+    ApiResponse<PostResponse> findById(
+            @RequestParam Map<String, String> params, @PathVariable String id) {
+        return ApiResponse.<PostResponse>builder().result(postService.findById(params, id)).build();
     }
 
     @GetMapping("/{id}/shippers")
-    ApiResponse<ShipperProfileResponse> getShippersByPost(@RequestParam String status, @PathVariable String id) {
+    ApiResponse<ShipperProfileResponse> getShippersByPost(
+            @RequestParam String status, @PathVariable String id) {
 
         return ApiResponse.<ShipperProfileResponse>builder()
                 .result(shipperPostService.getShipperProfileByPostId(id, status))
@@ -72,8 +74,18 @@ public class PostController {
 
     @PostMapping("/{id}/update")
     @PreAuthorize("hasRole('SHIPPER')")
-    ApiResponse<?> updatePostStatus(@PathVariable String id, @RequestBody UpdatePostStatusRequest request) {
-        postService.updatePostStatus(request.getStatus(), id, request.getPhoto(), request.getDescription());
+    ApiResponse<?> updatePostStatus(
+            @PathVariable String id, @RequestBody UpdatePostStatusRequest request) {
+        postService.updatePostStatus(
+                request.getStatus(), id, request.getPhoto(), request.getDescription());
         return ApiResponse.builder().build();
+    }
+
+    @GetMapping("/total")
+    @PreAuthorize("hasRole('ADMIN')")
+    ApiResponse<CountNumPostResponse> countNumPosts() {
+        return ApiResponse.<CountNumPostResponse>builder()
+                .result(postService.countNumPosts())
+                .build();
     }
 }

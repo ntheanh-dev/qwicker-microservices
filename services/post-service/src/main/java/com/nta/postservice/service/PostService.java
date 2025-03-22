@@ -9,6 +9,7 @@ import com.nta.event.dto.UpdatePostStatusRequestEvent;
 import com.nta.postservice.dto.request.PostCreationRequest;
 import com.nta.postservice.dto.request.internal.Payment;
 import com.nta.postservice.dto.request.internal.UploadImageRequest;
+import com.nta.postservice.dto.response.CountNumPostResponse;
 import com.nta.postservice.dto.response.PostResponse;
 import com.nta.postservice.dto.response.internal.*;
 import com.nta.postservice.entity.*;
@@ -402,5 +403,11 @@ public class PostService {
                         .build());
 
         postRepository.save(post);
+    }
+
+    public CountNumPostResponse countNumPosts() {
+        final long total = postRepository.count();
+        final long finished = postRepository.countByStatus(PostStatus.DELIVERED);
+        return CountNumPostResponse.builder().totalPosts(total).finishedPosts(finished).build();
     }
 }

@@ -4,16 +4,21 @@ import com.nta.identity.dto.request.*;
 import com.nta.identity.dto.response.AccountResponse;
 import com.nta.identity.dto.response.ApiResponse;
 import com.nta.identity.dto.response.DataExistResponse;
+import com.nta.identity.dto.response.NumAccountsResponse;
 import com.nta.identity.service.AccountService;
 import com.nta.identity.service.AuthenticationService;
+
 import jakarta.validation.Valid;
-import java.util.List;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/accounts")
@@ -45,9 +50,9 @@ public class AccountController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    ApiResponse<List<AccountResponse>> getAccounts() {
+    ApiResponse<List<AccountResponse>> getAccounts(@RequestParam String accountType) {
         return ApiResponse.<List<AccountResponse>>builder()
-                .result(accountService.getAccounts())
+                .result(accountService.getAccounts(accountType))
                 .build();
     }
 
@@ -65,13 +70,6 @@ public class AccountController {
         return ApiResponse.builder().build();
     }
 
-    //    @GetMapping("/my-info")
-    //    ApiResponse<AccountResponse> getMyInfo() {
-    //        return ApiResponse.<AccountResponse>builder()
-    //                .result(accountService.getMyInfo())
-    //                .build();
-    //    }
-
     @DeleteMapping("/{accountId}")
     ApiResponse<String> deleteAccount(@PathVariable String accountId) {
         accountService.deleteAccount(accountId);
@@ -87,16 +85,26 @@ public class AccountController {
     }
 
     @PostMapping("/check-username-exists")
-    ApiResponse<DataExistResponse> checkIfUsernameExists(@ModelAttribute @Valid CheckUsernameExistsRequest request) {
+    ApiResponse<DataExistResponse> checkIfUsernameExists(
+            @ModelAttribute @Valid CheckUsernameExistsRequest request) {
         return ApiResponse.<DataExistResponse>builder()
                 .result(accountService.checkIfUsernameExist(request))
                 .build();
     }
 
     @PostMapping("/check-email-exists")
-    ApiResponse<DataExistResponse> checkIfEmailExists(@ModelAttribute @Valid CheckEmailExistsRequest request) {
+    ApiResponse<DataExistResponse> checkIfEmailExists(
+            @ModelAttribute @Valid CheckEmailExistsRequest request) {
         return ApiResponse.<DataExistResponse>builder()
                 .result(accountService.checkIfEmailExist(request))
+                .build();
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/total")
+    ApiResponse<NumAccountsResponse> getNumAccounts() {
+        return ApiResponse.<NumAccountsResponse>builder()
+                .result(accountService.getNumAccounts())
                 .build();
     }
 }
