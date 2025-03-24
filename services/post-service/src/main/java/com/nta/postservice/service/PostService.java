@@ -37,10 +37,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -409,5 +406,16 @@ public class PostService {
         final long total = postRepository.count();
         final long finished = postRepository.countByStatus(PostStatus.DELIVERED);
         return CountNumPostResponse.builder().totalPosts(total).finishedPosts(finished).build();
+    }
+
+    public Map<String, Long> countOrdersByVehicle() {
+        final List<Object[]> posts = postRepository.countOrdersByVehicle();
+        final Map<String, Long> ordersByVehicle = new HashMap<>();
+        for (Object[] post : posts) {
+            String vehicleName = (String) post[0];
+            Long count = (Long) post[1];
+            ordersByVehicle.put(vehicleName, count);
+        }
+        return ordersByVehicle;
     }
 }

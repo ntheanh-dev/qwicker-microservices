@@ -26,4 +26,7 @@ public interface PostRepository extends JpaRepository<Post, String> {
     PostStatus findPostStatusByPostId(@Param("postId") String postId);
 
     long countByStatus(PostStatus status);
+
+    @Query("SELECT v.name, COUNT(p) FROM Post p JOIN p.vehicleType v GROUP BY v.name")
+    List<Object[]> countOrdersByVehicle();
 }
