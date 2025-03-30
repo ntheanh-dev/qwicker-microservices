@@ -79,6 +79,13 @@ services:
       MONGODB_ROOT_USER: root
       MONGODB_ROOT_PASSWORD: Admin@123
 
+  zipkin:
+    platform: linux/amd64
+    container_name: zipkin
+    image: openzipkin/zipkin
+    ports:
+      - '9411:9411'
+
 volumes:
   postgres:
   pgadmin:
