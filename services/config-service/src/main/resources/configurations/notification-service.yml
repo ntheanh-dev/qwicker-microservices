@@ -9,7 +9,7 @@ spring:
   data:
     mongodb:
       username: root
-      password: root
+      password: Admin@123
       host: ${mongodb:localhost}
       port: 27017
       database: notification

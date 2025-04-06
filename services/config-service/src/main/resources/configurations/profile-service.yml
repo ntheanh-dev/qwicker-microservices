@@ -12,7 +12,7 @@ spring:
     password: Admin@123
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: create
     show-sql: true
 
 application:

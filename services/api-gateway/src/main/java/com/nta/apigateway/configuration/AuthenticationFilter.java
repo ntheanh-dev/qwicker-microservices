@@ -4,13 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nta.apigateway.dto.response.ApiResponse;
 import com.nta.apigateway.service.IdentityService;
-
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -23,7 +21,6 @@ import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ServerWebExchange;
-
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
@@ -43,15 +40,17 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
     @NonFinal
     private String[] PUBLIC_ENDPOINTS =
-            new String[] {
-                "/identity/auth/.*",
-                "/identity/accounts/registration",
-                "/identity/accounts/check-username-exists",
-                "/identity/accounts/check-email-exists",
-                "/post/vehicles",
-                "/post/product-category",
-                "/payment/payments/vn-pay-callback",
-                "/location/distance"
+            new String[]{
+                    "/identity/auth/.*",
+                    "/identity/accounts/registration",
+                    "/identity/accounts/check-username-exists",
+                    "/identity/accounts/check-email-exists",
+                    "/identity/accounts/registration/sent-otp",
+                    "/identity/accounts/registration/verify-otp",
+                    "/post/vehicles",
+                    "/post/product-category",
+                    "/payment/payments/vn-pay-callback",
+                    "/location/distance"
             };
 
     @Override

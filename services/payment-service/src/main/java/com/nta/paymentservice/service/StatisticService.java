@@ -5,13 +5,10 @@ import com.nta.paymentservice.dto.response.StatisticIncomeResponse;
 import com.nta.paymentservice.enums.StatisticIncomeType;
 import com.nta.paymentservice.repository.PaymentRepository;
 import com.nta.paymentservice.repository.internal.PostClient;
-
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -31,7 +28,6 @@ public class StatisticService {
     PaymentRepository paymentRepository;
     DateUtils dateUtils;
 
-    @PreAuthorize("hasRole('SHIPPER')")
     public List<StatisticIncomeResponse> getStatistics(
             final String startDate, final String endDate, final String t) throws ParseException {
         final StatisticIncomeType type = StatisticIncomeType.fromCode(t);
@@ -39,7 +35,6 @@ public class StatisticService {
         final LocalDateTime to = dateUtils.parseDateTime(endDate);
         final var shipperId = authenticationService.getUserDetail().getId();
         final List<StatisticIncomeResponse> response = new ArrayList<>();
-
         List<Object[]> results = null;
         switch (type) {
             case HOURLY -> {
@@ -108,11 +103,9 @@ public class StatisticService {
         LocalDateTime dateTime = null;
         switch (type) {
             case HOURLY -> dateTime = LocalDateTime.parse(result[0].toString(), formatter);
-            case DAILY ->
-                    dateTime = LocalDateTime.parse(result[0].toString() + " 00:00:00", formatter);
-            case MONTHLY ->
-                    dateTime =
-                            LocalDateTime.parse(result[0].toString() + "-01 00:00:00", formatter);
+            case DAILY -> dateTime = LocalDateTime.parse(result[0].toString() + " 00:00:00", formatter);
+            case MONTHLY -> dateTime =
+                    LocalDateTime.parse(result[0].toString() + "-01 00:00:00", formatter);
         }
         return StatisticIncomeResponse.builder()
                 .type(type)
