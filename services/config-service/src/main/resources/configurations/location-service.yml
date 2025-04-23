@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: location-service
   datasource:
     url: "jdbc:mysql://${mysqldb:localhost}:3306/location"
     driverClassName: com.mysql.cj.jdbc.Driver
@@ -25,22 +27,16 @@ spring:
     redis:
       host: "${redis:localhost}"
       port: 6380
-  spring:
-    cloud:
-      circuitbreaker:
-        enabled: true
+  cloud:
+    circuitbreaker:
+      enabled: true
 
-        circuitBreaker:
-          greetingService:
-            threshold: 3
-            timeout: 1000  # Timeout in milliseconds
-            failureRateThreshold: 0.5  # 50% failure rate threshold
+      circuitBreaker:
+        greetingService:
+          threshold: 3
+          timeout: 1000  # Timeout in milliseconds
+          failureRateThreshold: 0.5  # 50% failure rate threshold
 
-
-application:
-  config:
-    post-url: http://localhost:8085/post
-    identity-url: http://localhost:8082/identity
 
 server:
   port: 8086

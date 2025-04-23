@@ -31,7 +31,6 @@ spring:
 
 application:
   config:
-    profile-url: http://localhost:8081/profile
     jwt:
       signerKey: "akdXchw5FloESb63Kc+DFhTARvpkowiUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij"
       valid-duration: 1 #in day

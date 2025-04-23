@@ -7,12 +7,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "identity-service", url = "${application.config.identity-url}")
+@FeignClient(name = "identity-service")
 public interface IdentityClient {
-  @PostMapping("/internal/accounts/shippers/{accountId}/ready-for-take-order")
-  ApiResponse<Boolean> isReadyForTakeOrder(@PathVariable String accountId);
+    @PostMapping("/identity/internal/accounts/shippers/{accountId}/ready-for-take-order")
+    ApiResponse<Boolean> isReadyForTakeOrder(@PathVariable String accountId);
 
-  @PostMapping("/internal/accounts/{accountId}/change-status")
-  ApiResponse<?> changeStatusById(
-      @PathVariable("accountId") String id, @RequestBody ChangeAccountStatusRequest request);
+    @PostMapping("/identity/internal/accounts/{accountId}/change-status")
+    ApiResponse<?> changeStatusById(
+            @PathVariable("accountId") String id, @RequestBody ChangeAccountStatusRequest request);
 }

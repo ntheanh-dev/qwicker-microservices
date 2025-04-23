@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
-@FeignClient(name = "post-service", url = "${application.config.post-url}")
+@FeignClient(name = "post-service")
 public interface PostClient {
-  @GetMapping("/internal/ratings/shipper/{shipperId}")
-  public ApiResponse<List<RatingResponse>> getRatingsByShipper(@PathVariable String shipperId);
+    @GetMapping("/profile/internal/ratings/shipper/{shipperId}")
+    public ApiResponse<List<RatingResponse>> getRatingsByShipper(@PathVariable String shipperId);
 }

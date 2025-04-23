@@ -4,9 +4,9 @@ server:
     context-path: /file
 
 cloudinary:
-  name: <>
-  key: <>
-  secret: <>
+  name: ""
+  key: ""
+  secret: ""
 
 spring:
   application:

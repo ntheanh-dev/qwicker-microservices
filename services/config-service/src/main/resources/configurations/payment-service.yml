@@ -17,8 +17,6 @@ spring:
     show-sql: true
 
 application:
-  config:
-    post-url: http://localhost:8085/post
   payment:
     vnPay:
       url: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"

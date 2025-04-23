@@ -15,8 +15,4 @@ spring:
       ddl-auto: create
     show-sql: true
 
-application:
-  config:
-    file-url: http://localhost:8084/file
-    post-url: http://localhost:8085/post
     

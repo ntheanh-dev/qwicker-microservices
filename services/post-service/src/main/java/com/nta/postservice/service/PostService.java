@@ -11,8 +11,13 @@ import com.nta.postservice.dto.request.internal.Payment;
 import com.nta.postservice.dto.request.internal.UploadImageRequest;
 import com.nta.postservice.dto.response.CountNumPostResponse;
 import com.nta.postservice.dto.response.PostResponse;
-import com.nta.postservice.dto.response.internal.*;
-import com.nta.postservice.entity.*;
+import com.nta.postservice.dto.response.internal.DeliveryLocationResponse;
+import com.nta.postservice.dto.response.internal.ShipperProfileResponse;
+import com.nta.postservice.dto.response.internal.UploadImageResponse;
+import com.nta.postservice.entity.Post;
+import com.nta.postservice.entity.PostHistory;
+import com.nta.postservice.entity.Product;
+import com.nta.postservice.entity.ShipperPost;
 import com.nta.postservice.enums.*;
 import com.nta.postservice.enums.internal.AccountType;
 import com.nta.postservice.exception.AppException;
@@ -23,14 +28,11 @@ import com.nta.postservice.repository.httpClient.FileClient;
 import com.nta.postservice.repository.httpClient.LocationClient;
 import com.nta.postservice.repository.httpClient.PaymentClient;
 import com.nta.postservice.repository.httpClient.ProfileClient;
-
 import feign.FeignException;
-
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -223,7 +225,7 @@ public class PostService {
             shipperProfileResponse.setRatingAverage(averageRating);
             shipperProfileResponseString = objectMapper.writeValueAsString(shipperProfileResponse);
         } catch (FeignException.FeignClientException
-                | JsonProcessingException feignClientException) {
+                 | JsonProcessingException feignClientException) {
             log.error(feignClientException.getMessage());
             throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);
         }
