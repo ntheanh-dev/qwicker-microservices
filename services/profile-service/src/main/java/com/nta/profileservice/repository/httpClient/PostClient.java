@@ -10,6 +10,6 @@ import java.util.List;
 
 @FeignClient(name = "post-service")
 public interface PostClient {
-    @GetMapping("/profile/internal/ratings/shipper/{shipperId}")
-    public ApiResponse<List<RatingResponse>> getRatingsByShipper(@PathVariable String shipperId);
+    @GetMapping("/post/internal/ratings/shipper/{shipperId}")
+    ApiResponse<List<RatingResponse>> getRatingsByShipper(@PathVariable String shipperId);
 }
