@@ -404,6 +404,12 @@ public class PostService {
         postRepository.save(post);
     }
 
+    public void cancelOrder(final String orderId) {
+        final Post post = postRepository.findById(orderId).get();
+        post.setStatus(PostStatus.CANCELED_BY_USER);
+        postRepository.save(post);
+    }
+
     public CountNumPostResponse countNumPosts() {
         final long total = postRepository.count();
         final long finished = postRepository.countByStatus(PostStatus.DELIVERED);

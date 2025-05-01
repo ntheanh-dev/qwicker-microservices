@@ -10,11 +10,9 @@ import com.nta.postservice.dto.response.internal.ShipperProfileResponse;
 import com.nta.postservice.entity.Post;
 import com.nta.postservice.service.PostService;
 import com.nta.postservice.service.ShipperPostService;
-
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -78,6 +76,12 @@ public class PostController {
             @PathVariable String id, @RequestBody UpdatePostStatusRequest request) {
         postService.updatePostStatus(
                 request.getStatus(), id, request.getPhoto(), request.getDescription());
+        return ApiResponse.builder().build();
+    }
+
+    @PostMapping("/{id}/cancel")
+    ApiResponse<?> cancelPost(@PathVariable String id) {
+        postService.cancelOrder(id);
         return ApiResponse.builder().build();
     }
 
