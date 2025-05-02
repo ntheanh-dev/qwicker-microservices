@@ -2,7 +2,6 @@ package com.nta.postservice.repository;
 
 import com.nta.postservice.entity.Post;
 import com.nta.postservice.enums.PostStatus;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,6 +20,9 @@ public interface PostRepository extends JpaRepository<Post, String> {
     @Query("SELECT p FROM Post p WHERE p.userId = :userId AND p.status IN :statusList")
     List<Post> findPostsByUserIdAndStatus(
             @Param("userId") String userId, @Param("statusList") List<PostStatus> statusList);
+
+    @Query("SELECT p FROM Post p WHERE p.status IN :statusList")
+    List<Post> findPostsByStatus(@Param("statusList") List<PostStatus> statusList);
 
     @Query("SELECT p.status FROM Post p WHERE p.id =: postId")
     PostStatus findPostStatusByPostId(@Param("postId") String postId);

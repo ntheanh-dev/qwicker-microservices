@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.nta.postservice.dto.request.PostCreationRequest;
 import com.nta.postservice.dto.request.UpdatePostStatusRequest;
 import com.nta.postservice.dto.response.ApiResponse;
-import com.nta.postservice.dto.response.CountNumPostResponse;
 import com.nta.postservice.dto.response.PostResponse;
 import com.nta.postservice.dto.response.internal.ShipperProfileResponse;
 import com.nta.postservice.entity.Post;
@@ -85,11 +84,5 @@ public class PostController {
         return ApiResponse.builder().build();
     }
 
-    @GetMapping("/total")
-    @PreAuthorize("hasRole('ADMIN')")
-    ApiResponse<CountNumPostResponse> countNumPosts() {
-        return ApiResponse.<CountNumPostResponse>builder()
-                .result(postService.countNumPosts())
-                .build();
-    }
+
 }

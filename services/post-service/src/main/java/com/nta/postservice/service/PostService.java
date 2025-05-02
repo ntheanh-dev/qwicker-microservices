@@ -269,6 +269,22 @@ public class PostService {
             return List.of();
         }
 
+        return fetchExternalPostData(posts);
+    }
+
+    public List<PostResponse> getPostsByStatusListForAdmin(final String statusList) {
+        List<Post> posts = null;
+        if (statusList == null || statusList.isEmpty()) {
+            posts = postRepository.findAll();
+        } else {
+            final List<PostStatus> statusEnumList =
+                    Arrays.stream(statusList.split(",")).map(PostStatus::fromCode).toList();
+            posts = postRepository.findPostsByStatus(statusEnumList);
+        }
+        return fetchExternalPostData(posts);
+    }
+
+    private List<PostResponse> fetchExternalPostData(final List<Post> posts) {
         final List<String> pickupLocationIds =
                 posts.stream().map(Post::getPickupLocationId).toList();
         final List<String> dropLocationIds = posts.stream().map(Post::getDropLocationId).toList();
@@ -291,17 +307,17 @@ public class PostService {
                                                                             p
                                                                                     .getPickupLocationId()))
                                             .findFirst()
-                                            .get());
+                                            .orElse(null));
                             postResponse.setDropLocation(
                                     dropLocationResponses.stream()
                                             .filter(pD -> pD.getId().equals(p.getDropLocationId()))
                                             .findFirst()
-                                            .get());
+                                            .orElse(null));
                             postResponse.setPayment(
                                     payments.stream()
                                             .filter(pM -> pM.getPostId().equals(p.getId()))
                                             .findFirst()
-                                            .get());
+                                            .orElse(null));
                             return postResponse;
                         })
                 .toList();
