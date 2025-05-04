@@ -1,6 +1,7 @@
 package com.nta.paymentservice.service;
 
 import com.nta.paymentservice.components.DateUtils;
+import com.nta.paymentservice.dto.response.MonthlyPaymentStatistics;
 import com.nta.paymentservice.dto.response.StatisticIncomeResponse;
 import com.nta.paymentservice.enums.StatisticIncomeType;
 import com.nta.paymentservice.repository.PaymentRepository;
@@ -115,5 +116,10 @@ public class StatisticService {
                 .cashRevenue((BigDecimal) result[3])
                 .vnPayRevenue((BigDecimal) result[4])
                 .build();
+    }
+
+    public List<MonthlyPaymentStatistics> getMonthlyStatistics() {
+        final var results = paymentRepository.getMonthlyPaymentStatistics();
+        return results.stream().map(r -> new MonthlyPaymentStatistics(r[0].toString(), r[1].toString(), r[2].toString())).toList();
     }
 }

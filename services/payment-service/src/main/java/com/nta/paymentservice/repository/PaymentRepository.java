@@ -66,5 +66,11 @@ public interface PaymentRepository extends JpaRepository<Payment, String> {
             @Param("endDate") LocalDateTime endDate,
             @Param("postIds") List<String> postIds);
 
-    boolean existsByPostId(String postId);
+    @Query(
+            "SELECT  DATE_FORMAT(pm.paidAt, '%m-%Y') AS month, " +
+                    "pm.paymentMethod AS paymentMethod, " +
+                    "SUM(pm.price) AS totalAmount " +
+                    "FROM Payment pm GROUP BY month, pm.paymentMethod " +
+                    "ORDER BY DATE_FORMAT(pm.paidAt, '%m-%Y')  DESC")
+    List<Object[]> getMonthlyPaymentStatistics();
 }

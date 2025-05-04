@@ -35,4 +35,10 @@ public class StatisticController {
                 .result(statisticService.getStatistics(startDate, endDate, type))
                 .build();
     }
+
+    @GetMapping("/transaction-amount")
+    @PreAuthorize("hasRole('ADMIN')")
+    ApiResponse<Object> getTransactionAmount() {
+        return ApiResponse.builder().result(statisticService.getMonthlyStatistics()).build();
+    }
 }
